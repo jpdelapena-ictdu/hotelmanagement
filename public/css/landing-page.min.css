@@ -1,0 +1,114 @@
+body{font-family:Lato,'Helvetica Neue',Helvetica,Arial,sans-serif}
+.navbartext{
+  color: black;
+  font-size: 20px;
+}
+
+.footertxt{
+  color: black;
+  font-size: 15px;
+}
+.icons {
+    padding: 50px;
+    transition: transform .2s; /* Animation */
+    width: 250px;
+    height: 100px;
+    opacity: 0.7;
+
+	
+    /*margin: 0 auto;*/
+}
+
+.button {
+    background-color: black; /* Green */
+    border: none;
+    color: white;
+    padding: 15px 32px;
+    text-align: center;
+    text-decoration: none;
+    display: inline-block;
+    font-size: 22px;
+    /*font-weight: bold;*/
+	font-family: 'Raleway', sans-serif;
+    border: 1px solid white;
+    border-radius: 10px;
+    padding-top:65px;
+    /*filter:blur(4px);*/
+}
+
+.icons:hover {
+    transform: scale(1.2); /* (150% zoom - Note: if the zoom is too large, it will go outside of the viewport) */
+}
+
+.iconname{
+	color: white;
+	top:100px;
+    position:relative;
+}
+
+.chmlogo{
+	align-content: center;
+	height:100px;
+	width:auto;
+	margin-left: auto;
+    margin-right: auto;
+}
+.dropdown {
+    position: relative;
+    display: inline-block;
+}
+
+.dropdown-content {
+    display: none;
+    position: absolute;
+    min-width: 160px;
+    box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+    padding: 12px 16px;
+    z-index: 1;
+    text-decoration-color: black;
+    color:black;
+}
+
+.dropdown:hover .dropdown-content {
+    display: block;
+    color:black;
+}
+
+.containerlogo{
+	top: 50px;
+}
+
+.center{
+	margin-left: auto;
+    margin-right: auto;
+    width: 8em;
+    text-align:center;
+	align-content:center;
+}
+
+.posright{
+	left: 150px;
+}
+
+.posleft{
+	right: 150px;
+}
+
+.title{
+	color: #45664d;
+	font-weight: 900;
+	font-size: 75px;
+	font-family: 'Montserrat', sans-serif;
+}
+.titlename{
+	color: #45664d;
+	font-weight: bold;
+	font-size: 15px;
+	font-family: 'Raleway', sans-serif;
+	white-space: nowrap;
+}
+
+h1,h2,h3,h4,h5,h6{font-family:Lato,'Helvetica Neue',Helvetica,Arial,sans-serif;font-weight:700}
+header.masthead{position:relative;background-color:#343a40;background:url(../img/bg-masthead.jpg) no-repeat center center;-webkit-background-size:cover;-moz-background-size:cover;-o-background-size:cover;background-size:cover;padding-top:8rem;padding-bottom:8rem}
+header.masthead .overlay{position:absolute;background-color:#212529;height:100%;width:100%;top:0;left:0;opacity:.3}
+header.masthead h1{font-size:2rem}@media (min-width:768px){header.masthead{padding-top:12rem;padding-bottom:12rem}header.masthead h1{font-size:3rem}}.showcase .showcase-text{padding:3rem}.showcase .showcase-img{min-height:30rem;background-size:cover}@media (min-width:768px){.showcase .showcase-text{padding:7rem}}.features-icons{padding-top:7rem;padding-bottom:7rem}.features-icons .features-icons-item{max-width:20rem}.features-icons .features-icons-item .features-icons-icon{height:7rem}.features-icons .features-icons-item .features-icons-icon i{font-size:4.5rem}.features-icons .features-icons-item:hover .features-icons-icon i{font-size:5rem}.testimonials{padding-top:7rem;padding-bottom:7rem}.testimonials .testimonial-item{max-width:18rem}.testimonials .testimonial-item img{max-width:12rem;box-shadow:0 5px 5px 0 #adb5bd}.call-to-action{position:relative;background-color:#343a40;background:url(../img/bg-masthead.jpg) no-repeat center center;-webkit-background-size:cover;-moz-background-size:cover;-o-background-size:cover;background-size:cover;padding-top:7rem;padding-bottom:7rem}.call-to-action .overlay{position:absolute;background-color:#212529;height:100%;width:100%;top:0;left:0;opacity:.3}footer.footer{padding-top:4rem;padding-bottom:4rem}
