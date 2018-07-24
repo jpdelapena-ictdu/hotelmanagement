@@ -8,7 +8,7 @@
           <div class="col-lg-3 center posright">
             <div class="features-icons-item mx-auto mb-5 mb-lg-0 mb-lg-3">
               <div class="features-icons-icon d-flex">
-                <a href="#"><button class="button m-auto icons">RESERVATION</button></a>
+                <a href="{{ backpack_url('room') }}"><button class="button m-auto icons">RESERVATION</button></a>
               </div>
             </div>
           </div>
