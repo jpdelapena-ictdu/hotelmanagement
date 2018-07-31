@@ -24,12 +24,13 @@
                                         <strong>{{ $errors->first('password') }}</strong>
                                     </span>
                                 @endif
+                                    
   </div>
   <button class="button" id="submit">LOGIN
     <div class="side-top-bottom"></div>
     <div class="side-left-right"></div>
   </button>
-  <small></small>
+  <small><a href="{{ route('register') }}">Register</small>
   </form>
 </div>
 </div>

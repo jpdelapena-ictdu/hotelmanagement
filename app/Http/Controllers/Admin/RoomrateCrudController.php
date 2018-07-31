@@ -41,13 +41,49 @@ class RoomrateCrudController extends CrudController
         // $this->crud->removeColumns(['column_name_1', 'column_name_2']); // remove an array of columns from the stack
         // $this->crud->setColumnDetails('column_name', ['attribute' => 'value']); // adjusts the properties of the passed in column (by name)
         // $this->crud->setColumnsDetails(['column_1', 'column_2'], ['attribute' => 'value']);
-
+        $this->crud->addColumn('boards')->beforeColumn('price');
+        $this->crud->addColumn('types')->beforeColumn('boards');
+        $this->crud->addColumn('rates')->beforeColumn('types');
+        $this->crud->removeColumn('rate_id');
+        $this->crud->removeColumn('board_id');
+        $this->crud->removeColumn('roomtype_id');
         // ------ CRUD FIELDS
         // $this->crud->addField($options, 'update/create/both');
         // $this->crud->addFields($array_of_arrays, 'update/create/both');
         // $this->crud->removeField('name', 'update/create/both');
         // $this->crud->removeFields($array_of_names, 'update/create/both');
-
+        $this->crud->addField(
+        [
+        // 1-n relationship
+        'label' => "Rate", // Table column heading
+        'type' => "select",
+        'name' => 'rate_id', // the column that contains the ID of that connected entity;
+        'entity' => 'rate', // the method that defines the relationship in your Model
+        'attribute' => "ratecode", // foreign key attribute that is shown to user
+        'model' => "App\Models\Rate", // foreign key model
+        ]);
+        $this->crud->addField(
+        [
+        // 1-n relationship
+        'label' => "Boards", // Table column heading
+        'type' => "select",
+        'name' => 'board_id', // the column that contains the ID of that connected entity;
+        'entity' => 'board', // the method that defines the relationship in your Model
+        'attribute' => "boardname", // foreign key attribute that is shown to user
+        'model' => "App\Models\Board", // foreign key model
+        ]);
+        $this->crud->addField(
+        [
+        // 1-n relationship
+        'label' => "Room Type", // Table column heading
+        'type' => "select",
+        'name' => 'roomtype_id', // the column that contains the ID of that connected entity;
+        'entity' => 'roomtype', // the method that defines the relationship in your Model
+        'attribute' => "typename", // foreign key attribute that is shown to user
+        'model' => "App\Models\Roomtype", // foreign key model
+        ]);
+        
+        
         // add asterisk for fields that are required in RoomrateRequest
         $this->crud->setRequiredFields(StoreRequest::class, 'create');
         $this->crud->setRequiredFields(UpdateRequest::class, 'edit');

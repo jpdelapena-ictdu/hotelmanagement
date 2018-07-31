@@ -44,6 +44,11 @@ class Room extends Model
     {
         return $this->belongsTo('App\Models\Building');
     }
+
+    public function roomrate()
+    {
+        return $this->hasMany('App\Models\Roomrate');
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES

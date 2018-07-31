@@ -19,7 +19,7 @@ class Roomrate extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['room_id','board_id','roomtype_id','price','inclusions'];
+    protected $fillable = ['rate_id','board_id','roomtype_id','price','inclusions'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -34,14 +34,17 @@ class Roomrate extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function room()
-    {
-       return $this->hasMany('App\Models\Room');
-    }
-
     public function roomtype()
     {
-       return $this->hasMany('App\Models\Room');
+       return $this->belongsTo('App\Models\Roomtype');
+    }
+    public function rate()
+    {
+       return $this->belongsTo('App\Models\Rate');
+    }
+    public function board()
+    {
+       return $this->belongsTo('App\Models\Board');
     }
     /*
     |--------------------------------------------------------------------------
@@ -54,7 +57,15 @@ class Roomrate extends Model
     | ACCESORS
     |--------------------------------------------------------------------------
     */
-
+    public function getRatesAttribute() {
+        return $this->rate->ratename;
+    }
+    public function getBoardsAttribute() {
+        return $this->board->boardname;
+    }
+    public function getTypesAttribute() {
+        return $this->roomtype->typecode;
+    }
     /*
     |--------------------------------------------------------------------------
     | MUTATORS

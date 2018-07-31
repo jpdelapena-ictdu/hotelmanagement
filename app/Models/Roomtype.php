@@ -38,6 +38,10 @@ class Roomtype extends Model
     {
        return $this->hasMany('App\Models\Room');
     }
+    public function roomrate()
+    {
+       return $this->hasMany('App\Models\Roomrate');
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -50,7 +54,10 @@ class Roomtype extends Model
     | ACCESORS
     |--------------------------------------------------------------------------
     */
-
+    // public function getAvailableAttribute() {
+    //     $total = DB::table('rooms')->where('status', 0)->count();
+    //     return $total;
+    // }
   
     /*
     |--------------------------------------------------------------------------

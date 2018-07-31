@@ -35,7 +35,7 @@ class RoomtypeCrudController extends CrudController
         $this->crud->setFromDb();
 
         // ------ CRUD COLUMNS
-         $this->crud->addColumn('stats');
+         $this->crud->addColumn('available');
          $this->crud->removeColumn('status');
         // $this->crud->addColumn(); // add a single column, at the end of the stack
         // $this->crud->addColumns(); // add multiple columns, at the end of the stack

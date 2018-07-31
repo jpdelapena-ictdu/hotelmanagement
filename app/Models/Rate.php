@@ -34,7 +34,10 @@ class Rate extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-
+    public function roomrate()
+    {
+       return $this->hasMany('App\Models\Roomrate');
+    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES

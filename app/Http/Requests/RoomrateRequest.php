@@ -26,7 +26,10 @@ class RoomrateRequest extends FormRequest
     public function rules()
     {
         return [
-            // 'name' => 'required|min:5|max:255'
+            'rate_id' => 'required',
+            'board_id' => 'required',
+            'roomtype_id' => 'required',
+            'price' => 'required'
         ];
     }
 
