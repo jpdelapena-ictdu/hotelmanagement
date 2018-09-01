@@ -5,7 +5,7 @@ namespace App\Http\Requests;
 use App\Http\Requests\Request;
 use Illuminate\Foundation\Http\FormRequest;
 
-class RoomtypeRequest extends FormRequest
+class FoodRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,11 +27,6 @@ class RoomtypeRequest extends FormRequest
     {
         return [
             // 'name' => 'required|min:5|max:255'
-            'typecode' => 'required',
-            'typename' => 'required',
-            'defaultprice' => 'required'
-            // 'quantity' => 'required'
-            // 'status' => 'required'
         ];
     }
 

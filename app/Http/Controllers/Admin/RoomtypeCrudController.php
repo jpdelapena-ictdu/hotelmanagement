@@ -7,6 +7,11 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 // VALIDATION: change the requests to match your own file names if you need form validation
 use App\Http\Requests\RoomtypeRequest as StoreRequest;
 use App\Http\Requests\RoomtypeRequest as UpdateRequest;
+use App\Models\Room;
+use App\Models\Roomtype;
+use App\Models\Food;
+use App\Models\Bathroom;
+use App\Models\Amenity;
 
 /**
  * Class RoomtypeCrudController
@@ -17,6 +22,9 @@ class RoomtypeCrudController extends CrudController
 {
     public function setup()
     {
+        $foods = Food::all();
+        $bathrooms = Bathroom::all();
+        $amenities = Amenity::all();
         /*
         |--------------------------------------------------------------------------
         | BASIC CRUD INFORMATION
@@ -35,8 +43,32 @@ class RoomtypeCrudController extends CrudController
         $this->crud->setFromDb();
 
         // ------ CRUD COLUMNS
-         $this->crud->addColumn('available');
+         // $this->crud->addColumn('available');
          $this->crud->removeColumn('status');
+
+         $this->crud->addColumn([
+           'name' => 'rooms', // The db column name
+           'label' => "Available", // Table column heading
+           'type' => 'availablerooms'
+        ]);
+
+        $this->crud->addColumn([
+           'name' => 'food', // The db column name
+           'label' => "Food & Drink", // Table column heading
+           'type' => 'foods'
+        ]);
+
+        $this->crud->addColumn([
+           'name' => 'bathrooms', // The db column name
+           'label' => "Bathroom", // Table column heading
+           'type' => 'bathrooms'
+        ]);
+
+        $this->crud->addColumn([
+           'name' => 'amenities', // The db column name
+           'label' => "Room Amenities", // Table column heading
+           'type' => 'amenities'
+        ]);
         // $this->crud->addColumn(); // add a single column, at the end of the stack
         // $this->crud->addColumns(); // add multiple columns, at the end of the stack
         // $this->crud->removeColumn('column_name'); // remove a column from the stack
@@ -50,6 +82,65 @@ class RoomtypeCrudController extends CrudController
         // 'options' => ['0' => 'Available', '1' => 'Occupied' /*'2' => 'Under Maintenance'*/],
         // ]); // adjusts the properties of the passed in column (by name)
         // ------ CRUD FIELDS
+         foreach ($foods as $food) {
+            $this->crud->addField([ // Checkbox
+                'name' => 'food_'. $food->id,
+                'label' => $food->name,
+                'type' => 'checkbox',
+                'tab' => 'Foods'
+            ], 'create');
+        }
+
+        foreach($bathrooms as $bathroom) {
+            $this->crud->addField([ // Checkbox
+                'name' => 'bathroom_'. $bathroom->id,
+                'label' => $bathroom->name,
+                'type' => 'checkbox',
+                'tab' => 'Bathrooms'
+            ], 'create');
+        }
+
+        foreach($amenities as $amenity) {
+            $this->crud->addField([ // Checkbox
+                'name' => 'amenity_'. $amenity->id,
+                'label' => $amenity->name,
+                'type' => 'checkbox',
+                'tab' => 'Amenities'
+            ], 'create');
+        }
+
+        foreach ($foods as $food) {
+            $this->crud->addField([
+              // Custom Field
+              'name' => 'food_'. $food->id,
+              'label' => $food->name,
+              'type' => 'food_checkbox',
+              'tab' => 'Foods'
+              /// 'view_namespace' => 'yourpackage' // use a custom namespace of your package to load views within a custom view folder.
+            ], 'update');
+        }
+
+        foreach ($bathrooms as $bathroom) {
+            $this->crud->addField([
+              // Custom Field
+              'name' => 'bathroom_'. $bathroom->id,
+              'label' => $bathroom->name,
+              'type' => 'bathroom_checkbox',
+              'tab' => 'Bathrooms'
+              /// 'view_namespace' => 'yourpackage' // use a custom namespace of your package to load views within a custom view folder.
+            ], 'update');
+        }
+
+        foreach ($amenities as $amenity) {
+            $this->crud->addField([
+              // Custom Field
+              'name' => 'amenity_'. $amenity->id,
+              'label' => $amenity->name,
+              'type' => 'amenity_checkbox',
+              'tab' => 'Amenities'
+              /// 'view_namespace' => 'yourpackage' // use a custom namespace of your package to load views within a custom view folder.
+            ], 'update');
+        }
         // $this->crud->addField($options, 'update/create/both');
         // $this->crud->addFields($array_of_arrays, 'update/create/both');
         // $this->crud->removeField('name', 'update/create/both');
@@ -117,19 +208,98 @@ class RoomtypeCrudController extends CrudController
 
     public function store(StoreRequest $request)
     {
+        $foodArray = array();
+        $bathroomArray = array();
+        $amenityArray = array();
+
+        print_r($_POST);
+        foreach ($_POST as $key => $value) {
+            if($value == 1) {
+                if (strpos($key, 'food_') !== false) {
+                    // echo $key;
+                    // echo substr($key, 5) . "<br>";
+                    $foodArray[substr($key, 5)] = substr($key, 5);
+                }
+                if (strpos($key, 'bathroom_') !== false) {
+                    // echo $key;
+                    // echo substr($key, 8) . "<br>";
+                    $bathroomArray[substr($key, 9)] = substr($key, 9);
+                }
+                if (strpos($key, 'amenity_') !== false) {
+                    // echo $key;
+                    // echo substr($key, 7) . "<br>";
+                    $amenityArray[substr($key, 8)] = substr($key, 8);
+                }
+            }
+        }
+
         // your additional operations before save here
         $redirect_location = parent::storeCrud($request);
         // your additional operations after save here
         // use $this->data['entry'] or $this->crud->entry
+        $newRecordId = $this->data['entry']['id'];
+
+        $roomtype = Roomtype::find($newRecordId);
+
+        $roomtype->foods()->sync($foodArray, false);
+        $roomtype->bathrooms()->sync($bathroomArray, false);
+        $roomtype->amenities()->sync($amenityArray, false);
+
         return $redirect_location;
     }
 
     public function update(UpdateRequest $request)
     {
+        $foodArray = array();
+        $bathroomArray = array();
+        $amenityArray = array();
+
+        print_r($_POST);
+        foreach ($_POST as $key => $value) {
+            if($value == 1) {
+                if (strpos($key, 'food_') !== false) {
+                    // echo $key;
+                    // echo substr($key, 5) . "<br>";
+                    $foodArray[substr($key, 5)] = substr($key, 5);
+                }
+                if (strpos($key, 'bathroom_') !== false) {
+                    // echo $key;
+                    // echo substr($key, 8) . "<br>";
+                    $bathroomArray[substr($key, 9)] = substr($key, 9);
+                }
+                if (strpos($key, 'amenity_') !== false) {
+                    // echo $key;
+                    // echo substr($key, 7) . "<br>";
+                    $amenityArray[substr($key, 8)] = substr($key, 8);
+                }
+            }
+        }
+
         // your additional operations before save here
         $redirect_location = parent::updateCrud($request);
         // your additional operations after save here
         // use $this->data['entry'] or $this->crud->entry
+        $newRecordId = $this->data['entry']['id'];
+
+        $roomtype = Roomtype::find($newRecordId);
+
+        $roomtype->foods()->sync($foodArray, true);
+        $roomtype->bathrooms()->sync($bathroomArray, true);
+        $roomtype->amenities()->sync($amenityArray, true);
+
         return $redirect_location;
+    }
+
+    public function destroy($id)
+    {
+        $roomtype = Roomtype::find($id);
+
+        $roomtype->foods()->detach();
+        $roomtype->bathrooms()->detach();
+        $roomtype->amenities()->detach();
+        $roomtype->delete();
+        // $this->crud->hasAccessOrFail('delete');
+
+        // return $this->crud->delete($id);
     }
 }

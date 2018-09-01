@@ -17,4 +17,14 @@ Route::group([
 	CRUD::resource('rate', 'rateCrudController');
 	CRUD::resource('board', 'boardCrudController');
 	CRUD::resource('roomrate', 'roomrateCrudController');
+	CRUD::resource('customer', 'CustomerCrudController');
+	CRUD::resource('food', 'FoodCrudController');
+	CRUD::resource('bathroom', 'BathroomCrudController');
+	CRUD::resource('amenity', 'AmenityCrudController');
+	CRUD::resource('reservation', 'ReservationCrudController');
+
+	Route::get('getroom/{val}', 'ReservationCrudController@getroom');
+	Route::get('edit/getroom/{val}/{room_id}', 'ReservationCrudController@editgetroom');
+	Route::get('getnight/{dm}/{dd}/{dy}/{am}/{ad}/{ay}', 'ReservationCrudController@getnight');
+
 }); // this should be the absolute last line of this file

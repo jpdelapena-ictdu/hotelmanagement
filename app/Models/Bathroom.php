@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Model;
 use Backpack\CRUD\CrudTrait;
 
-class Roomtype extends Model
+class Bathroom extends Model
 {
     use CrudTrait;
 
@@ -15,11 +15,11 @@ class Roomtype extends Model
     |--------------------------------------------------------------------------
     */
 
-    protected $table = 'roomtypes';
-    protected $primaryKey = 'id';
+    protected $table = 'bathrooms';
+    // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['typecode','typename','defaultprice','extrabed'];
+    protected $fillable = ['name'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -34,26 +34,11 @@ class Roomtype extends Model
     | RELATIONS
     |--------------------------------------------------------------------------
     */
-    public function room()
-    {
-       return $this->hasMany('App\Models\Room');
-    }
-    public function roomrate()
-    {
-       return $this->hasMany('App\Models\Roomrate');
+
+    public function roomtypes() {
+        return $this->belongsToMany('App\Models\Roomtype')->withTimestamps();
     }
 
-    public function foods() {
-        return $this->belongsToMany('App\Models\Food')->withTimestamps();
-    }
-
-    public function bathrooms() {
-        return $this->belongsToMany('App\Models\Bathroom')->withTimestamps();
-    }
-
-    public function amenities() {
-        return $this->belongsToMany('App\Models\Amenity')->withTimestamps();
-    }
     /*
     |--------------------------------------------------------------------------
     | SCOPES
@@ -65,11 +50,7 @@ class Roomtype extends Model
     | ACCESORS
     |--------------------------------------------------------------------------
     */
-    // public function getAvailableAttribute() {
-    //     $total = DB::table('rooms')->where('status', 0)->count();
-    //     return $total;
-    // }
-  
+
     /*
     |--------------------------------------------------------------------------
     | MUTATORS

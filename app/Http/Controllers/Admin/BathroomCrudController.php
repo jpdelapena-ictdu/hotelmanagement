@@ -5,16 +5,15 @@ namespace App\Http\Controllers\Admin;
 use Backpack\CRUD\app\Http\Controllers\CrudController;
 
 // VALIDATION: change the requests to match your own file names if you need form validation
-use App\Http\Requests\RoomRequest as StoreRequest;
-use App\Http\Requests\RoomRequest as UpdateRequest;
-use App\Models\Room;
+use App\Http\Requests\BathroomRequest as StoreRequest;
+use App\Http\Requests\BathroomRequest as UpdateRequest;
 
 /**
- * Class RoomCrudController
+ * Class BathroomCrudController
  * @package App\Http\Controllers\Admin
  * @property-read CrudPanel $crud
  */
-class RoomCrudController extends CrudController
+class BathroomCrudController extends CrudController
 {
     public function setup()
     {
@@ -23,9 +22,9 @@ class RoomCrudController extends CrudController
         | BASIC CRUD INFORMATION
         |--------------------------------------------------------------------------
         */
-        $this->crud->setModel('App\Models\Room');
-        $this->crud->setRoute(config('backpack.base.route_prefix') . '/room');
-        $this->crud->setEntityNameStrings('room', 'rooms');
+        $this->crud->setModel('App\Models\Bathroom');
+        $this->crud->setRoute(config('backpack.base.route_prefix') . '/bathroom');
+        $this->crud->setEntityNameStrings('bathroom', 'bathrooms');
 
         /*
         |--------------------------------------------------------------------------
@@ -42,51 +41,14 @@ class RoomCrudController extends CrudController
         // $this->crud->removeColumns(['column_name_1', 'column_name_2']); // remove an array of columns from the stack
         // $this->crud->setColumnDetails('column_name', ['attribute' => 'value']); // adjusts the properties of the passed in column (by name)
         // $this->crud->setColumnsDetails(['column_1', 'column_2'], ['attribute' => 'value']);
-        $this->crud->addColumn('type');
-        $this->crud->removeColumn('roomtype_id');
-        $this->crud->addColumn('bldg');
-        $this->crud->removeColumn('building_id');
-        $this->crud->addColumn('stats');
-        $this->crud->removeColumn('status');
-        
+
         // ------ CRUD FIELDS
         // $this->crud->addField($options, 'update/create/both');
         // $this->crud->addFields($array_of_arrays, 'update/create/both');
         // $this->crud->removeField('name', 'update/create/both');
         // $this->crud->removeFields($array_of_names, 'update/create/both');
-        $this->crud->addField(
-        [
-        // 1-n relationship
-        'label' => "Building", // Table column heading
-        'type' => "select",
-        'name' => 'building_id', // the column that contains the ID of that connected entity;
-        'entity' => 'building', // the method that defines the relationship in your Model
-        'attribute' => "bldgname", // foreign key attribute that is shown to user
-        'model' => "App\Models\building", // foreign key model
-        ]);
 
-        $this->crud->addField(
-        [
-        // 1-n relationship
-        'label' => "Room Type", // Table column heading
-        'type' => "select",
-        'name' => 'roomtype_id', // the column that contains the ID of that connected entity;
-        'entity' => 'roomtype', // the method that defines the relationship in your Model
-        'attribute' => "typename", // foreign key attribute that is shown to user
-        'model' => "App\Models\Roomtype", // foreign key model
-        ]);
-
-        $this->crud->addField(
-        [ // select_from_array
-        'name' => 'status',
-        'label' => "Status",
-        'type' => 'select_from_array',
-        'options' => ['0' => 'Available', '1' => 'Occupied', '2' => 'Under Maintenance'],
-        'allows_null' => false,
-        'default' => 'one',
-    // 'allows_multiple' => true, // OPTIONAL; needs you to cast this to array in your model;
-        ]);
-        // add asterisk for fields that are required in RoomRequest
+        // add asterisk for fields that are required in BathroomRequest
         $this->crud->setRequiredFields(StoreRequest::class, 'create');
         $this->crud->setRequiredFields(UpdateRequest::class, 'edit');
 
@@ -147,17 +109,6 @@ class RoomCrudController extends CrudController
 
     public function store(StoreRequest $request)
     {
-        $rooms = Room::all();
-
-        // print_r($_POST);
-
-        foreach ($rooms as $row) {
-            if ($row->roomcode == $request->roomcode && $row->building_id == $request->building_id) {
-                // show a error message
-                \Alert::warning('This room already exists in this building')->flash();
-                return redirect()->back();
-            }
-        }
         // your additional operations before save here
         $redirect_location = parent::storeCrud($request);
         // your additional operations after save here
