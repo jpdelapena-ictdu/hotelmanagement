@@ -32,6 +32,14 @@ class Room extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
+    public function roomCalendar($crud = false)
+    {
+        return '<a class="btn btn-xs btn-default" target="_blank" href="room/'.$this->id.'/calendar" data-toggle="tooltip" title="Check room availability"><i class="fa fa-search"></i> Availability</a>';
+    }
+    /*public function roomAvailability($crud = false)
+    {
+        return '<a class="btn btn-xs btn-default" target="_blank" href="room/'.$this->roomcode.'/availability" data-toggle="tooltip" title="Room Availability"><i class="fa fa-plus"></i> Calendar</a>';
+    }*/
 
     /*
     |--------------------------------------------------------------------------
@@ -91,15 +99,6 @@ class Room extends Model
         }
 
         return $status;
-        /*if($this->status == 0){
-            return 'Available';
-        }
-        if($this->status == 1){
-            return 'Occupied';
-        }
-        if($this->status == 2){
-            return 'Under Maintenance';
-        }*/
     }
 
     public function getTypeAttribute() {

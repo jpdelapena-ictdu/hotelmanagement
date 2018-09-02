@@ -8,6 +8,9 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 use App\Http\Requests\RoomRequest as StoreRequest;
 use App\Http\Requests\RoomRequest as UpdateRequest;
 use App\Models\Room;
+use App\Models\Reservation;
+use App\Models\Customer;
+use App\Models\Roomtype;
 
 /**
  * Class RoomCrudController
@@ -91,6 +94,8 @@ class RoomCrudController extends CrudController
         $this->crud->setRequiredFields(UpdateRequest::class, 'edit');
 
         // ------ CRUD BUTTONS
+        // $this->crud->addButtonFromModelFunction('line', 'room_availabity', 'roomAvailabilty', 'beginning');
+        $this->crud->addButtonFromModelFunction('line', 'room_calendar', 'roomCalendar', 'beginning'); // add a button whose HTML is returned by a method in the CRUD model
         // possible positions: 'beginning' and 'end'; defaults to 'beginning' for the 'line' stack, 'end' for the others;
         // $this->crud->addButton($stack, $name, $type, $content, $position); // add a button; possible types are: view, model_function
         // $this->crud->addButtonFromModelFunction($stack, $name, $model_function_name, $position); // add a button whose HTML is returned by a method in the CRUD model
@@ -172,5 +177,38 @@ class RoomCrudController extends CrudController
         // your additional operations after save here
         // use $this->data['entry'] or $this->crud->entry
         return $redirect_location;
+    }
+
+    public function roomCalendar($roomid) {
+        $reservation = Reservation::where('room_id', $roomid)->get();
+        $room = Room::find($roomid);
+        $x = 0;
+        $reservationArr = [];
+        $customerName = '';
+        $roomtypeName = '';
+        // print_r(json_encode($reservation));
+        foreach ($reservation as $row) {
+            $customer = Customer::where('customer_id', $row->customer_id)->first();
+            $roomtype = Roomtype::find($row->roomtype_id);
+            $customerName = $customer->firstname. ' ' .$customer->lastname;
+            $roomtypeName = $roomtype->typename;
+
+            $reservationArr[$x++] = [
+                'id' => $row->id,
+                'customer_id' => $row->customer_id,
+                'customer_name' => $customerName,
+                'roomtype_id' => $row->roomtype_id,
+                'roomtype_name' => $roomtypeName,
+                'rate_id' => $row->rate_id,
+                'arrival' => $row->arrival,
+                'departure' => $row->departure
+            ];
+        }
+
+        $reservationArr = json_decode(json_encode($reservationArr));
+
+        return view('rooms.calendar')
+                ->with('reservations', $reservationArr)
+                ->with('room', $room);
     }
 }
