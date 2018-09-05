@@ -195,6 +195,7 @@ class RoomCrudController extends CrudController
 
             $reservationArr[$x++] = [
                 'id' => $row->id,
+                'reservation_code' => $row->reservation_code,
                 'customer_id' => $row->customer_id,
                 'customer_name' => $customerName,
                 'roomtype_id' => $row->roomtype_id,

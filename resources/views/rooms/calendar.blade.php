@@ -60,7 +60,7 @@
             events : [
                 @foreach($reservations as $reservation)
                 {
-                    title : '{{ "Customer: " .$reservation->customer_name. " (Roomtype: " .$reservation->roomtype_name. ")"}}',
+                    title : '{{ "Customer: " .$reservation->customer_name. " (Reservation Code: " .$reservation->reservation_code. ")"}}',
                     start : '{{ $reservation->arrival }}',
                     end: '{{ date('Y-m-d', strtotime($reservation->departure . ' +1 day')) }}',
                     url : ''
