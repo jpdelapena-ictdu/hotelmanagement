@@ -60,13 +60,20 @@
                     </select>
 				</div>
 
-          		<div class="form-group col-xs-6">
-    				<label>Roomtype</label>
-        			<select name="roomtype_id" class="form-control select2_from_array">
-        				<option>---</option>
-        				@foreach($roomtypes as $key => $value)
-						<option value="{{$key}}">{{$value}}</option>
-						@endforeach
+				<div class="form-group col-xs-6">
+					<label>Arrival</label>
+					<input type='text' class='arrival_date form-control' id="arrival_date" name="arrival">
+				</div>
+
+				<div class="form-group col-xs-6">
+					<label>Departure</label>
+					<input type='text' class='departure_date form-control' id="departure_date" name="departure" disabled>
+				</div>
+
+          		<div class="form-group col-xs-6" id="roomtype_content">
+    				<label id="rtype_label">Roomtype</label>
+        			<select id="rtype_select" name="roomtype_id" class="form-control" disabled>
+
                     </select>
                 </div>
 
@@ -77,37 +84,19 @@
                 	</select>
                 </div>
 
-                <div class="form-group col-xs-12">
-    				<label>Rate</label>
-    				<select name="rate_id" class="form-control select2_from_array">
-        				<option>---</option>
-        				@foreach($rates as $row)
-						<option value="{{$row->id}}">{{$row->ratecode}}</option>
-						@endforeach
-                    </select>
-            	</div>
+                <div class="form-group col-xs-6">
+                	<label id="rate_label">Rate</label>
+                	<select id="rate_select" name="rate_id" class="form-control" disabled>
+                		
+                	</select>
+                </div>	
 
-				<div class="form-group col-xs-4">
-					<label>Arrival</label>
-					<input type='text' class='arrival_date form-control' id="arrival_date" name="arrival">
-				</div>
-
-				<div class="form-group col-xs-4">
-					<label>Departure</label>
-					<input type='text' class='departure_date form-control' id="departure_date" name="departure" disabled>
-				</div>
-
-				<div class="form-group col-xs-4" id="night_content">
-					<label id="night_l">Nights</label>
-					<input type="text" id="night_i" class="form-control" value="0" disabled>
-                </div>
-
-                <div class="form-group col-xs-12">
+            	<div class="form-group col-xs-6">
    					<label>Adults</label>
    					<input type="text" name="adults" value="" class="form-control">
-          		</div>
+          		</div>	
 
-          		<div class="form-group col-xs-12">
+            	<div class="form-group col-xs-12">
         			<div class="col-xs-6">
         				<div class="checkbox">
 	    					<label>
@@ -133,7 +122,7 @@
           		<div class="form-group col-xs-12">
    					<label>Additional Information</label>
    					<textarea name="notes" value="" class="form-control"></textarea>
-          		</div>
+          		</div>		
 
 		    </div><!-- /.box-body -->
 		    <div class="box-footer">
@@ -174,27 +163,39 @@ $("select[name='roomtype_id']").change(function(e)
 {
  	e.preventDefault();
 
+	var departure = $('#departure_date').val();
+	var arrival = $('#arrival_date').val();
 	$y = $(this).val();
-  	// alert($y);
+  	
+	$("#remove_s").attr("disabled", false);
+  	$("#remove_s").find('option').remove();
+  	$("#rate_select").attr("disabled", false);
+  	$("#rate_select").find('option').remove();
 
-  	$("select").remove( "#remove_select" );
-  	$("label").remove( "#remove_label" );
-  	$("select").remove( "#remove_s" );
-  	$("label").remove( "#remove_l" );
-
-	$.ajax
+  	$.ajax
  		({
- 			url: '{{ url('admin/getroom') }}/'+$y,
+ 			url: '{{ url('admin/getroom') }}/'+$y+'/'+departure+'/'+arrival,
  			type: 'GET',
  			dataType: 'html',
  			success: function(data)
  			{
- 				$("#room_content").append(data);
- 				// $("#room_content").html(data);
- 				// console.log(data);
+ 				$("#remove_s").append(data);
  			}
  		});
+
+ 	$.ajax
+ 		({
+ 			url: '{{ url('admin/getrate') }}/'+$y,
+ 			type: 'GET',
+ 			dataType: 'html',
+ 			success: function(data)
+ 			{
+ 				$("#rate_select").append(data);
+ 			}
+ 		});
+  	
 });
+
 </script>{{-- roomtype onchange --}}
 
 <script>
@@ -202,9 +203,10 @@ $("select[name='roomtype_id']").change(function(e)
 	$('.arrival_date').each(function(){
         $(this).datepicker({
 	    	onSelect: function(dateText) {
-	      		// alert(this.value);
+	      		
 	      		$("input[name='departure']").attr("disabled", false);
 	      		var departure = $('#departure_date').val();
+	      		$("#rtype_select").find('option').remove();
 
 	      		if(departure === ''){
 	      			// do nothing
@@ -214,14 +216,12 @@ $("select[name='roomtype_id']").change(function(e)
 
 		      		$.ajax
 				 		({
-				 			url: '{{ url('admin/getnight') }}/'+departure+'/'+this.value,
+				 			url: '{{ url('admin/getroomtype') }}/'+departure+'/'+this.value,
 				 			type: 'GET',
 				 			dataType: 'html',
 				 			success: function(data)
 				 			{
-				 				$("#night_content").append(data);
-				 				// $("#room_content").html(data);
-				 				// console.log(data);
+				 				$("#rtype_select").append(data);
 				 			}
 				 		});
 	      		}
@@ -233,23 +233,21 @@ $("select[name='roomtype_id']").change(function(e)
     $('.departure_date').each(function(){
         $(this).datepicker({
 	    	onSelect: function(dateText) {
-	      		// alert(this.value);
+
 	      		var arrival = $('#arrival_date').val();
 
-	      		$("input").remove( "#night" );
-  				$("label").remove( "#night_label" );
-  				$("input").remove( "#night_i" );
-  				$("label").remove( "#night_l" );
+				$("#remove_s").attr("disabled", true);
+				$("#rtype_select").attr("disabled", false);
+  				$("#rtype_select").find('option').remove();
 
 	      		$.ajax
 			 		({
-			 			url: '{{ url('admin/getnight') }}/'+this.value+'/'+arrival,
+			 			url: '{{ url('admin/getroomtype') }}/'+this.value+'/'+arrival,
 			 			type: 'GET',
 			 			dataType: 'html',
 			 			success: function(data)
 			 			{
-			 				$("#night_content").append(data);
-			 				// $("#room_content").html(data);
+			 				$("#rtype_select").append(data);
 			 				// console.log(data);
 			 			}
 			 		});

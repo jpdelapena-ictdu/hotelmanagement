@@ -10,6 +10,7 @@ use App\Http\Requests\CustomerRequest as UpdateRequest;
 use App\Models\Customer;
 use App\Models\Roomtype;
 use App\Models\Room;
+use App\Transaction;
 
 /**
  * Class CustomerCrudController
@@ -57,6 +58,7 @@ class CustomerCrudController extends CrudController
         $this->crud->setRequiredFields(UpdateRequest::class, 'edit');
 
         // ------ CRUD BUTTONS
+        $this->crud->addButtonFromModelFunction('line', 'open_google', 'openGoogle', 'beginning'); // add a button whose HTML is returned by a method in the CRUD model
         // possible positions: 'beginning' and 'end'; defaults to 'beginning' for the 'line' stack, 'end' for the others;
         // $this->crud->addButton($stack, $name, $type, $content, $position); // add a button; possible types are: view, model_function
         // $this->crud->addButtonFromModelFunction($stack, $name, $model_function_name, $position); // add a button whose HTML is returned by a method in the CRUD model
@@ -137,5 +139,24 @@ class CustomerCrudController extends CrudController
         // your additional operations after save here
         // use $this->data['entry'] or $this->crud->entry
         return $redirect_location;
+    }
+
+    public function unpaidTransaction($id) {
+        $unpaidTransactions = Transaction::where([['customer_id', $id], ['status', 0]])->get();
+        $customer = Customer::where('customer_id', $id)->first();
+
+        // print_r($unpaidTransactions);
+        return view('customers.unpaid-transaction')
+            ->with('unpaidTransactions', $unpaidTransactions)
+            ->with('customer', $customer);
+    }
+
+    public function paidTransaction($id) {
+        $paidTransactions = Transaction::where([['customer_id', $id], ['status', 1]])->get();
+        $customer = Customer::where('customer_id', $id)->first();
+
+        return view('customers.paid-transaction')
+            ->with('paidTransactions', $paidTransactions)
+            ->with('customer', $customer);
     }
 }

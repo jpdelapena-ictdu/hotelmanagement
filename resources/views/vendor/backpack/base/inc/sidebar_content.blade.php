@@ -17,8 +17,9 @@
 			<li><a href="{{ backpack_url('rate') }}"><i class="fa fa-cc-mastercard"></i> <span>Rates</span></a></li>
 			<li><a href="{{ backpack_url('board') }}"><i class="fa fa-coffee"></i> <span>Boards</span></a></li>
 			<li><a href="{{ backpack_url('roomrate') }}"><i class="fa fa-credit-card"></i> <span>Room Rates</span></a></li>
-			<li><a href="{{ backpack_url('customer') }}"><i class="fa fa-bed"></i> <span>Customers</span></a></li>
 		</ul>
 </li>
+<li><a href="{{ backpack_url('customer') }}"><i class="fa fa-bed"></i> <span>Customers</span></a></li>
 <li><a href="{{ backpack_url('reservation') }}"><i class="fa fa-dashboard"></i> <span>Reservations</span></a></li>
+
 

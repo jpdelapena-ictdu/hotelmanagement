@@ -63,9 +63,19 @@
                     </select>
 				</div>
 
+				<div class="form-group col-xs-6">
+					<label>Arrival</label>
+					<input type='text' class='arrival_date form-control' id="arrival_date" name="arrival">
+				</div>
+
+				<div class="form-group col-xs-6">
+					<label>Departure</label>
+					<input type='text' class='departure_date form-control' id="departure_date" name="departure">
+				</div>
+
           		<div class="form-group col-xs-6">
     				<label>Roomtype</label>
-        			<select name="roomtype_id" class="form-control select2_from_array">
+        			<select id="rtype_select" name="roomtype_id" class="form-control select2_from_array">
         				<option>---</option>
         				@foreach($roomtypes as $key => $value)
 						<option @if($reservation->roomtype_id == $key) selected @endif value="{{$key}}">{{$value}}</option>
@@ -74,10 +84,13 @@
                 </div>
 
                 <div class="form-group col-xs-6" id="room_content">
-                	
+                	<label id="remove_l">Room</label>
+                	<select id="remove_s" name="room_id" class="form-control">
+
+                	</select>
                 </div>
 
-                <div class="form-group col-xs-12">
+                <div class="form-group col-xs-6">
     				<label>Rate</label>
     				<select name="rate_id" class="form-control select2_from_array">
         				<option>---</option>
@@ -87,21 +100,7 @@
                     </select>
             	</div>
 
-				<div class="form-group col-xs-4">
-					<label>Arrival</label>
-					<input type='text' class='arrival_date form-control' id="arrival_date" name="arrival">
-				</div>
-
-				<div class="form-group col-xs-4">
-					<label>Departure</label>
-					<input type='text' class='departure_date form-control' id="departure_date" name="departure">
-				</div>
-
-				<div class="form-group col-xs-4" id="night_content">
-                	
-                </div>
-
-                <div class="form-group col-xs-12">
+                <div class="form-group col-xs-6">
    					<label>Adults</label>
    					<input type="text" name="adults" value="{{$reservation->adults}}" class="form-control">
           		</div>
@@ -174,6 +173,8 @@
 $(document).ready(function() {
 	/*get room*/
     $y = $("select[name='roomtype_id']").val();
+    var departure = $('#departure_date').val();
+	var arrival = $('#arrival_date').val();
   	// alert($y);
 
   	$("select").remove( "#remove_select" );
@@ -181,36 +182,17 @@ $(document).ready(function() {
 
 	$.ajax
  		({
- 			url: '{{ url('admin/edit/getroom') }}/'+$y+'/'+<?php echo $reservation->room_id ?>,
+ 			url: '{{ url('admin/edit/getroom') }}/'+$y+'/'+<?php echo $reservation->room_id ?>+'/'+departure+'/'+arrival,
  			type: 'GET',
  			dataType: 'html',
  			success: function(data)
  			{
- 				$("#room_content").append(data);
+ 				$("#remove_s").append(data);
  				// $("#room_content").html(data);
  				// console.log(data);
  			}
  		});/*get room*/
 
- 	/*get night*/
- 	var arrival = $('#arrival_date').val();
- 	var departure = $('#departure_date').val();
-
-		$("input").remove( "#night" );
-		$("label").remove( "#night_label" );
-
-		$.ajax
- 		({
- 			url: '{{ url('admin/getnight') }}/'+departure+'/'+arrival,
- 			type: 'GET',
- 			dataType: 'html',
- 			success: function(data)
- 			{
- 				$("#night_content").append(data);
- 				// $("#room_content").html(data);
- 				// console.log(data);
- 			}
- 		});/*get night*/
 });
 </script>
 
@@ -223,19 +205,19 @@ $("select[name='roomtype_id']").change(function(e)
  	e.preventDefault();
 
 	$y = $(this).val();
-  	// alert($y);
+  	var departure = $('#departure_date').val();
+	var arrival = $('#arrival_date').val();
 
-  	$("select").remove( "#remove_select" );
-  	$("label").remove( "#remove_label" );
+  	$("#remove_s").find('option').remove();
 
 	$.ajax
  		({
- 			url: '{{ url('admin/getroom') }}/'+$y,
+ 			url: '{{ url('admin/edit/getroom') }}/'+$y+'/'+<?php echo $reservation->room_id ?>+'/'+departure+'/'+arrival,
  			type: 'GET',
  			dataType: 'html',
  			success: function(data)
  			{
- 				$("#room_content").append(data);
+ 				$("#remove_s").append(data);
  				// $("#room_content").html(data);
  				// console.log(data);
  			}
@@ -251,23 +233,20 @@ $("select[name='roomtype_id']").change(function(e)
 	      		// alert(this.value);
 	      		$("input[name='departure']").attr("disabled", false);
 	      		var departure = $('#departure_date').val();
+	      		$("#rtype_select").find('option').remove();
 
 	      		if(departure === ''){
 	      			// do nothing
 	      		} else {
-	      			$("input").remove( "#night" );
-	  				$("label").remove( "#night_label" );
-
+	      			
 		      		$.ajax
 				 		({
-				 			url: '{{ url('admin/getnight') }}/'+departure+'/'+this.value,
+				 			url: '{{ url('admin/getroomtype') }}/'+departure+'/'+this.value,
 				 			type: 'GET',
 				 			dataType: 'html',
 				 			success: function(data)
 				 			{
-				 				$("#night_content").append(data);
-				 				// $("#room_content").html(data);
-				 				// console.log(data);
+				 				$("#rtype_select").append(data);
 				 			}
 				 		});
 	      		}
@@ -284,18 +263,16 @@ $("select[name='roomtype_id']").change(function(e)
 	      		// alert(this.value);
 	      		var arrival = $('#arrival_date').val();
 
-	      		$("input").remove( "#night" );
-  				$("label").remove( "#night_label" );
+	      		$("#rtype_select").find('option').remove();
 
 	      		$.ajax
 			 		({
-			 			url: '{{ url('admin/getnight') }}/'+this.value+'/'+arrival,
+			 			url: '{{ url('admin/getroomtype') }}/'+this.value+'/'+arrival,
 			 			type: 'GET',
 			 			dataType: 'html',
 			 			success: function(data)
 			 			{
-			 				$("#night_content").append(data);
-			 				// $("#room_content").html(data);
+			 				$("#rtype_select").append(data);
 			 				// console.log(data);
 			 			}
 			 		});

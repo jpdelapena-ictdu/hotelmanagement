@@ -11,6 +11,10 @@ use App\Models\Roomtype;
 use App\Models\Rate;
 use App\Models\Customer;
 use App\Models\Reservation;
+use App\Models\Room;
+use App\Billing;
+use App\Models\Roomrate;
+use App\Transaction;
 use DateTime;
 use DateInterval;
 use DatePeriod;
@@ -22,6 +26,9 @@ use DatePeriod;
  */
 class ReservationCrudController extends CrudController
 {
+    var $availableRoomTypes = [];
+    var $availableRooms = [];
+    var $unavailableRooms = [];  
     
 
     public function setup()
@@ -127,6 +134,7 @@ class ReservationCrudController extends CrudController
         // $this->crud->addClause('withoutGlobalScope', VisibleScope::class);
         // $this->crud->with(); // eager load relationships
         // $this->crud->orderBy();
+        $this->crud->orderBy('created_at', 'desc');
         // $this->crud->groupBy();
         // $this->crud->limit();
     }
@@ -234,20 +242,32 @@ class ReservationCrudController extends CrudController
         // your additional operations before save here
         $redirect_location = parent::storeCrud($request);
         // your additional operations after save here
+
+        // TRANSACTION
+
+        $transaction = New Transaction;
+        $room = Room::find($request->room_id);
+        $roomtype = Roomtype::find($request->roomtype_id);
+        $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
+        $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
+        $transaction->customer_id = $request->customer_id;
+        $transaction->room_id = $request->room_id;
+        $transaction->roomtype_id = $request->roomtype_id;
+        $transaction->arrival = $en_arrival;
+        $transaction->departure = $en_departure;
+        $transaction->description = $description;
+        $transaction->amount = $roomrate->price;
+        $transaction->status = 0;
+        $transaction->save();
+
+        // TRANSACTION END
+
         // use $this->data['entry'] or $this->crud->entry
         return $redirect_location;
     }
 
     public function update(UpdateRequest $request)
     {
-        /*if ($request->has('early_checkin')) {
-            $request->offsetSet('early_checkin', 1);
-        }
-
-        if ($request->has('late_checkout')) {
-            $request->offsetSet('late_checkout', 1);
-        }*/
-
         $en_arrival = date('Y-m-d H:i:s', strtotime($request->arrival));
         $en_departure = date('Y-m-d H:i:s', strtotime($request->departure));
         /*$request->offsetSet('arrival', $en_arrival);
@@ -265,6 +285,12 @@ class ReservationCrudController extends CrudController
         ]);
 
         $reservation = Reservation::find($request->reservation_id);
+
+        $old_arrival = $reservation->arrival;
+        $old_departure = $reservation->departure;
+        $old_customerID = $reservation->customer_id;
+        $old_roomtypeID = $reservation->roomtype_id;
+        $old_roomID = $reservation->room_id;
 
         $reservation->customer_id = $request->customer_id;
         $reservation->roomtype_id = $request->roomtype_id;
@@ -290,6 +316,23 @@ class ReservationCrudController extends CrudController
         }
 
         $reservation->save();
+
+        // UPDATE TRANSACTION
+        $room = Room::find($request->room_id);
+        $roomtype = Roomtype::find($request->roomtype_id);
+        $transaction = Transaction::where([['customer_id', $old_customerID], ['room_id', $old_roomID], ['roomtype_id', $old_roomtypeID], ['arrival', $old_arrival], ['departure', $old_departure]])->first();
+        $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
+
+        $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
+        $transaction->customer_id = $request->customer_id;
+        $transaction->room_id = $request->room_id;
+        $transaction->roomtype_id = $request->roomtype_id;
+        $transaction->arrival = $en_arrival;
+        $transaction->departure = $en_departure;
+        $transaction->description = $description;
+        $transaction->amount = $roomrate->price;
+        $transaction->save();
+
         // show a success message
         \Alert::success('The item has been modified successfully.')->flash();
 
@@ -297,36 +340,135 @@ class ReservationCrudController extends CrudController
 
     }
 
+    public function getrate($roomtype_id) {
+        $roomrates = Roomrate::where('roomtype_id', $roomtype_id)->get();
+        $rateArr = [];
+        $x = 0;
 
-    public function getroom($id)
+        foreach ($roomrates as $row) {
+            $rate = Rate::find($row->rate_id);
+            $rateArr[$x++] = [
+                'id' => $rate->id,
+                'ratecode' => $rate->ratecode,
+                'ratename' => $rate->ratename
+            ];
+        }
+
+        $rateArr = json_decode(json_encode($rateArr));
+
+        $html = '';
+
+        $html .= '<option> --- </option>';
+        foreach ($rateArr as $row) {
+            $html .= '<option value="'.$row->id.'"> ' .$row->ratecode. ' </option>';
+        }
+
+        return $html;
+    }
+
+
+    public function getroom($id, $dm, $dd, $dy, $am, $ad, $ay)
     {
 
         $roomtype = Roomtype::findOrFail($id);
         $packages = $roomtype->room;
+        $arrival_date = date("Y-m-d", strtotime($am.'/'.$ad.'/'.$ay));
+        $departure_date = date("Y-m-d", strtotime($dm.'/'.$dd.'/'.$dy));
+        $rooms = Room::all();
+        $roomtypes = Roomtype::all();
+        $reservations = Reservation::all();
+        $unavailRooms = [];
+        $availRoomTypes = [];
+        $x = 0;
+        $c = 0;
+        $z = 0;
 
-        // return response()->json($packages);
+        foreach ($reservations as $row) {
 
-        // Send as HTML
+            $start_date = new DateTime($arrival_date);
+            $end_date = new DateTime($departure_date);
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($start_date, $interval, $end_date);
+
+            $r_start = new DateTime($row->arrival);
+            $r_end = new DateTime($row->departure);
+            $r_interval = DateInterval::createFromDateString('1 day');
+            $r_period = new DatePeriod($r_start, $r_interval, $r_end);
+
+            foreach ($period as $dt) {
+
+                foreach ($r_period as $r_dt) {
+                    if ($dt->format("Y-m-d") == $r_dt->format("Y-m-d")) {
+                        if (!in_array($row->room_id, $unavailRooms)) {
+                            $unavailRooms[$c++] = $row->room_id;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
 
         $html = '';
 
-        $html .= '<label id="remove_label">Room</label><select id="remove_select" name="room_id" class="form-control select2_from_array">';
-         $html .= '<option> --- </option>';
-         foreach ($packages as $package)
-         {
-         $html .= '<option value="'.$package->id.'"> '.$package->roomcode.' </option>';
-         }
-         $html .= '</select>';
+        $html .= '<option> --- </option>';
+        foreach ($packages as $package)
+        {
+            if (!in_array($package->id, $unavailRooms)) {
+                $html .= '<option value="'.$package->id.'"> '.$package->roomcode.' </option>';
+            }
+        }
 
         return $html;
 
     }
 
-    public function editgetroom($id, $room_id)
+    public function editgetroom($id, $room_id, $dm, $dd, $dy, $am, $ad, $ay)
     {
 
         $roomtype = Roomtype::findOrFail($id);
         $packages = $roomtype->room;
+
+        $arrival_date = date("Y-m-d", strtotime($am.'/'.$ad.'/'.$ay));
+        $departure_date = date("Y-m-d", strtotime($dm.'/'.$dd.'/'.$dy));
+        $rooms = Room::all();
+        $roomtypes = Roomtype::all();
+        $reservations = Reservation::all();
+        $unavailRooms = [];
+        $availRoomTypes = [];
+        $x = 0;
+        $c = 0;
+        $z = 0;
+
+        foreach ($reservations as $row) {
+
+            $start_date = new DateTime($arrival_date);
+            $end_date = new DateTime($departure_date);
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($start_date, $interval, $end_date);
+
+            $r_start = new DateTime($row->arrival);
+            $r_end = new DateTime($row->departure);
+            $r_interval = DateInterval::createFromDateString('1 day');
+            $r_period = new DatePeriod($r_start, $r_interval, $r_end);
+
+            foreach ($period as $dt) {
+
+                foreach ($r_period as $r_dt) {
+                    if ($dt->format("Y-m-d") == $r_dt->format("Y-m-d")) {
+                        if (!in_array($row->room_id, $unavailRooms)) {
+                            if ($row->room_id == $room_id) {
+                                break;
+                            } else {
+                                $unavailRooms[$c++] = $row->room_id;
+                                break;
+                            }
+                        }
+                    }
+                }
+            }
+
+        }
 
         // return response()->json($packages);
 
@@ -334,13 +476,15 @@ class ReservationCrudController extends CrudController
 
         $html = '';
 
-        $html .= '<label id="remove_label">Room</label><select id="remove_select" name="room_id" class="form-control select2_from_array">';
+        // $html .= '<label id="remove_label">Room</label><select id="remove_select" name="room_id" class="form-control select2_from_array">';
          $html .= '<option> --- </option>';
          foreach ($packages as $package)
          {
-         $html .= '<option '.($room_id == $package->id ? 'selected':'').' value="'.$package->id.'"> '.$package->roomcode.' </option>';
+            if (!in_array($package->id, $unavailRooms)) {
+                $html .= '<option '.($room_id == $package->id ? 'selected':'').' value="'.$package->id.'"> '.$package->roomcode.' </option>';
+            }
          }
-         $html .= '</select>';
+         // $html .= '</select>';
 
         return $html;
 
@@ -357,6 +501,73 @@ class ReservationCrudController extends CrudController
         $night = round($datediff / (60 * 60 * 24));
 
         $html = '<label id="night_label">Nights</label><input type="text" name="night" id="night" class="form-control" value="'.$night.'" disabled>';
+        return $html;
+
+    }
+
+    public function getroomtype($dm, $dd, $dy, $am, $ad, $ay)
+    {
+        array_splice($this->availableRoomTypes, 0);
+        array_splice($this->availableRooms, 0);
+        array_splice($this->unavailableRooms, 0);
+
+        $arrival_date = date("Y-m-d", strtotime($am.'/'.$ad.'/'.$ay));
+        $departure_date = date("Y-m-d", strtotime($dm.'/'.$dd.'/'.$dy));
+        $rooms = Room::all();
+        $roomtypes = Roomtype::all();
+        $reservations = Reservation::all();
+        $x = 0;
+        $c = 0;
+        $z = 0;
+
+
+        foreach ($reservations as $row) {
+
+            $start_date = new DateTime($arrival_date);
+            $end_date = new DateTime($departure_date);
+            $interval = DateInterval::createFromDateString('1 day');
+            $period = new DatePeriod($start_date, $interval, $end_date);
+
+            $r_start = new DateTime($row->arrival);
+            $r_end = new DateTime($row->departure);
+            $r_interval = DateInterval::createFromDateString('1 day');
+            $r_period = new DatePeriod($r_start, $r_interval, $r_end);
+
+            foreach ($period as $dt) {
+
+                foreach ($r_period as $r_dt) {
+                    if ($dt->format("Y-m-d") == $r_dt->format("Y-m-d")) {
+                        if (!in_array($row->room_id, $this->unavailableRooms)) {
+                            $this->unavailableRooms[$c++] = $row->room_id;
+                            break;
+                        }
+                    }
+                }
+            }
+
+        }
+
+        foreach ($rooms as $row) {
+            if(!in_array($row->id, $this->unavailableRooms)) {
+                $this->availableRooms[$x++] = $row->id;
+                if (!in_array($row->roomtype_id, $this->availableRoomTypes)) {
+                    $this->availableRoomTypes[$z++] = $row->roomtype_id;
+                }
+            }
+        }
+
+        $html = '';
+
+        // $html .= '<label id="roomtype_label">Roomtype</label><select id="roomtype_select" name="roomtype_id" class="form-control select2_from_array">';
+        $html .= '<option> --- </option>';
+        foreach ($roomtypes as $row)
+        {
+            if (in_array($row->id, $this->availableRoomTypes)) {
+                $html .= '<option value="'.$row->id.'"> '.$row->typecode.' </option>';
+            }
+        }
+        // $html .= '</select>';
+
         return $html;
 
     }

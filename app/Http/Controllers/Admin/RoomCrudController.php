@@ -29,6 +29,8 @@ class RoomCrudController extends CrudController
         $this->crud->setModel('App\Models\Room');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/room');
         $this->crud->setEntityNameStrings('room', 'rooms');
+        $this->crud->setListView('vendor.backpack.base.room_list');
+
 
         /*
         |--------------------------------------------------------------------------
@@ -95,7 +97,8 @@ class RoomCrudController extends CrudController
 
         // ------ CRUD BUTTONS
         // $this->crud->addButtonFromModelFunction('line', 'room_availabity', 'roomAvailabilty', 'beginning');
-        $this->crud->addButtonFromModelFunction('line', 'room_calendar', 'roomCalendar', 'beginning'); // add a button whose HTML is returned by a method in the CRUD model
+        // $this->crud->addButtonFromModelFunction('line', 'room_calendar', 'roomCalendar', 'beginning'); // add a button whose HTML is returned by a method in the CRUD model
+        $this->crud->addButtonFromView('line', 'calendarBtn', 'roomCal', 'beginning');
         // possible positions: 'beginning' and 'end'; defaults to 'beginning' for the 'line' stack, 'end' for the others;
         // $this->crud->addButton($stack, $name, $type, $content, $position); // add a button; possible types are: view, model_function
         // $this->crud->addButtonFromModelFunction($stack, $name, $model_function_name, $position); // add a button whose HTML is returned by a method in the CRUD model
@@ -106,6 +109,7 @@ class RoomCrudController extends CrudController
         // $this->crud->removeAllButtonsFromStack('line');
 
         // ------ CRUD ACCESS
+        $this->crud->allowAccess(['list', 'create', 'update', 'delete', 'room_cal']);
         // $this->crud->allowAccess(['list', 'create', 'update', 'reorder', 'delete']);
         // $this->crud->denyAccess(['list', 'create', 'update', 'reorder', 'delete']);
 
@@ -179,14 +183,14 @@ class RoomCrudController extends CrudController
         return $redirect_location;
     }
 
-    public function roomCalendar($roomid) {
-        $reservation = Reservation::where('room_id', $roomid)->get();
-        $room = Room::find($roomid);
+    public function roomCalendar($id) {
+        $reservation = Reservation::where('room_id', $id)->get();
+        $room = Room::find($id);
         $x = 0;
         $reservationArr = [];
         $customerName = '';
         $roomtypeName = '';
-        // print_r(json_encode($reservation));
+        
         foreach ($reservation as $row) {
             $customer = Customer::where('customer_id', $row->customer_id)->first();
             $roomtype = Roomtype::find($row->roomtype_id);
@@ -202,14 +206,13 @@ class RoomCrudController extends CrudController
                 'roomtype_name' => $roomtypeName,
                 'rate_id' => $row->rate_id,
                 'arrival' => $row->arrival,
-                'departure' => $row->departure
+                'departure' => date('Y-m-d', strtotime($row->departure . ' +1 day'))
             ];
         }
 
         $reservationArr = json_decode(json_encode($reservationArr));
 
-        return view('rooms.calendar')
-                ->with('reservations', $reservationArr)
-                ->with('room', $room);
+        return $reservationArr;
     }
+
 }

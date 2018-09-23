@@ -29,11 +29,20 @@ class Customer extends Model
     |--------------------------------------------------------------------------
     */
 
+    public function openGoogle($crud = false)
+    {
+        return '<a class="btn btn-xs btn-default" target="_blank" href="customer/' .$this->customer_id. '/transactions" data-toggle="tooltip" title="Just a demo custom button."><i class="fa fa-list"></i> Transactions</a>';
+    }
+
     /*
     |--------------------------------------------------------------------------
     | RELATIONS
     |--------------------------------------------------------------------------
     */
+
+    public function transactions(){
+        return $this->hasMany('App\Transaction');
+    }
 
     /*
     |--------------------------------------------------------------------------
