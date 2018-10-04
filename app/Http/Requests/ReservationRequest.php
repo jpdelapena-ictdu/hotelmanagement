@@ -27,6 +27,13 @@ class ReservationRequest extends FormRequest
     {
         return [
             // 'name' => 'required|min:5|max:255'
+            'customer_id' => 'required',
+            'roomtype_id' => 'required',
+            'room_id' => 'required',
+            'rate_id' => 'required',
+            'arrival' => 'required',
+            'departure' => 'required',
+            'payment' => 'required'
         ];
     }
 

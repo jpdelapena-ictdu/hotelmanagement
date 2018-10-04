@@ -14,13 +14,13 @@
 @section('header')
 	<section class="content-header">
 	  <h1>
-        <span class="text-capitalize">{{ $customer->firstname. ' ' .$customer->lastname }}</span>
-        <small>Transaction</small>
+        <span class="text-capitalize">Expected Guests</span>
+        <small>Arriving guests for today</small>
 	  </h1>
 	  <ol class="breadcrumb">
 	    <li><a href="{{ url('admin/dashboard') }}">Admin</a></li>
-	    <li><a href="{{ backpack_url('customer') }}" class="text-capitalize">Customers</a></li>
-	    <li class="active">Transaction</li>
+	    <li><a href="{{ backpack_url('reservations') }}" class="text-capitalize">Reservations</a></li>
+	    <li class="active">Expected Guests</li>
 	  </ol>
 	</section>
 @endsection
@@ -34,29 +34,54 @@
       <div class="box">
         <div class="box-header hidden-print with-border">
         
-          <a href="{{ route('customer.unpaid', $customer->customer_id) }}" class="btn btn-primary ladda-button" data-style="zoom-in"><span class="ladda-label"><i class="fa fa-eye"></i> View Unpaid Transactions</span></a>
+          
         	  		  			  	
           <div id="datatable_button_stack" class="pull-right text-right hidden-xs"></div>
         </div>
 
         <div class="box-body overflow-hidden">
 			
-            <table id="customerTable" class="table">
+            <table id="reservationTable" class="table">
                 <thead>
                     <tr>
-                        <th>Description</th>
-                        <th>Date</th>
-                        <th>Amount</th>
+                        <th>Reservation Code</th>
+                        <th>Customer Name</th>
+                        <th>Room Type</th>
+                        <th>Room</th>
+                        <th>Rate</th>
+                        <th>Arrival</th>
+                        <th>Departure</th>
+                        <th>Check in</th>
+                        <th>Check out</th>
+                        <th>Payment</th>
+                        <th>Additional Information</th>
+                        <th>Notes</th>
+                        <th>Actions</th>
                     </tr>                    
                 </thead>
                 <tbody>
-                  @foreach($paidTransactions as $row)
-                    <tr>
-                        <td style="width: 50%;">{{ $row->description }}</td>
-                        <td style="width: 30%;">{{ $row->created_at->toDayDateTimeString() }}</td>
-                        <td>{{ $row->amount }}</td>
-                    </tr>
-                    @endforeach
+                	@foreach($reservations as $row)
+                  	<tr>
+                  		<td>{{ $row->reservation_code }}</td>
+                  		<td>{{ $row->customer_name }}</td>
+                  		<td>{{ $row->roomtypecode }}</td>
+                  		<td>{{ $row->roomcode }}</td>
+                  		<td>{{ $row->ratecode }}</td>
+                  		<td>{{ $row->arrival }}</td>
+                  		<td>{{ $row->departure }}</td>
+                  		<td>{{ $row->check_in }}</td>
+                  		<td>{{ $row->check_out }}</td>
+                  		<td>{{ $row->payment }}</td>
+                  		<td>{{ $row->notes }}</td>
+                  		<td>{{ $row->additional_information }}</td>
+                  		<td><button form="checkInForm{{ $row->id }}" class="btn btn-xs btn-success"><i class="fa fa-sign-in"></i> Check in</button>
+
+						<form onsubmit="return confirmCheckIn()" id="checkInForm{{ $row->id }}" method="POST" action="{{ route('check-in', $row->id) }}">
+							{{ csrf_field() }}
+
+						</form></td>
+                  	</tr>
+                  	@endforeach
                 </tbody>
             </table>
 
@@ -79,7 +104,20 @@
 
 <script>
     $(document).ready( function () {
-        $('#customerTable').DataTable();
+        $('#reservationTable').DataTable({
+        	"iDisplayLength": 50,
+			"aLengthMenu": [[10, 25, 50, 100,500,1000,-1], [10, 25, 50,100,500,1000, "All"]],
+        });
     } );
+
+	function confirmCheckIn()
+	{
+		var x = confirm("Confirm Check-In.");
+		if (x)
+		return true;
+		else
+		return false;
+	}   
+
 </script>
 @endsection

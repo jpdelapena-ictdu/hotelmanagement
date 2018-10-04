@@ -18,6 +18,7 @@ use App\Transaction;
 use DateTime;
 use DateInterval;
 use DatePeriod;
+use Carbon\Carbon;
 
 /**
  * Class ReservationCrudController
@@ -44,6 +45,8 @@ class ReservationCrudController extends CrudController
 
         $this->crud->setCreateView('vendor.backpack.base.reservation_create');
         $this->crud->setEditView('vendor.backpack.base.reservation_edit');
+        $this->crud->setListView('vendor.backpack.base.reservation_list');
+
 
         /*
         |--------------------------------------------------------------------------
@@ -59,9 +62,9 @@ class ReservationCrudController extends CrudController
         $this->crud->addColumn('room_type')->afterColumn('customer_name');
         $this->crud->addColumn('room')->afterColumn('room_type');
         $this->crud->addColumn('rate')->afterColumn('room');
-        $this->crud->addColumn('night')->afterColumn('departure');
+        $this->crud->addColumn('night')->afterColumn('departure');/*
         $this->crud->addColumn('early_in')->afterColumn('adults');
-        $this->crud->addColumn('late_out')->afterColumn('early_in');
+        $this->crud->addColumn('late_out')->afterColumn('early_in');*/
         $this->crud->addColumn('note');
         
         // $this->crud->addColumn(); // add a single column, at the end of the stack
@@ -84,6 +87,11 @@ class ReservationCrudController extends CrudController
         $this->crud->setRequiredFields(UpdateRequest::class, 'edit');
 
         // ------ CRUD BUTTONS
+        
+        // $this->crud->addButtonFromView('line', 'btnCheckIn', 'checkIn', 'beginning');
+        $this->crud->addButtonFromModelFunction('top', 'expected_guests', 'expectedGuests', 'last');
+        $this->crud->addButtonFromModelFunction('top', 'open_google', 'openGoogle', 'last');
+        // $this->crud->addButtonFromModelFunction('top', 'open_google', 'openGoogle', 'last'); // add a button whose HTML is returned by a method in the CRUD model
         // possible positions: 'beginning' and 'end'; defaults to 'beginning' for the 'line' stack, 'end' for the others;
         // $this->crud->addButton($stack, $name, $type, $content, $position); // add a button; possible types are: view, model_function
         // $this->crud->addButtonFromModelFunction($stack, $name, $model_function_name, $position); // add a button whose HTML is returned by a method in the CRUD model
@@ -94,6 +102,7 @@ class ReservationCrudController extends CrudController
         // $this->crud->removeAllButtonsFromStack('line');
 
         // ------ CRUD ACCESS
+        $this->crud->allowAccess(['list', 'create', 'update', 'reorder', 'delete', 'expected_guests']);
         // $this->crud->allowAccess(['list', 'create', 'update', 'reorder', 'delete']);
         // $this->crud->denyAccess(['list', 'create', 'update', 'reorder', 'delete']);
 
@@ -217,14 +226,6 @@ class ReservationCrudController extends CrudController
             }
         }
 
-        if ($request->has('early_checkin')) {
-            $request->offsetSet('early_checkin', 1);
-        }
-
-        if ($request->has('late_checkout')) {
-            $request->offsetSet('late_checkout', 1);
-        }
-
         $reservation_code = '';
         $reservation = Reservation::orderBy('created_at', 'desc')->first();
         $reservations = Reservation::all();
@@ -245,20 +246,55 @@ class ReservationCrudController extends CrudController
 
         // TRANSACTION
 
-        $transaction = New Transaction;
         $room = Room::find($request->room_id);
         $roomtype = Roomtype::find($request->roomtype_id);
         $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
-        $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
-        $transaction->customer_id = $request->customer_id;
-        $transaction->room_id = $request->room_id;
-        $transaction->roomtype_id = $request->roomtype_id;
-        $transaction->arrival = $en_arrival;
-        $transaction->departure = $en_departure;
-        $transaction->description = $description;
-        $transaction->amount = $roomrate->price;
-        $transaction->status = 0;
-        $transaction->save();
+
+        if (!$request->payment == '') {
+            if ($request->payment == $roomrate->price) {
+
+                $transaction = New Transaction;
+        
+                $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
+                $transaction->customer_id = $request->customer_id;
+                $transaction->room_id = $request->room_id;
+                $transaction->roomtype_id = $request->roomtype_id;
+                $transaction->arrival = $en_arrival;
+                $transaction->departure = $en_departure;
+                $transaction->description = $description;
+                $transaction->amount = $roomrate->price;
+                $transaction->status = 1;
+                $transaction->save();
+
+            }
+            else {
+                $balance = $roomrate->price - $request->payment;
+                $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename. ' (Paid: ' .$request->payment. ', Balance: '. $balance. ')';
+                $transaction = New Transaction;
+
+                $transaction->customer_id = $request->customer_id;
+                $transaction->room_id = $request->room_id;
+                $transaction->roomtype_id = $request->roomtype_id;
+                $transaction->description = $description;
+                $transaction->amount = $request->payment;
+                $transaction->status = 1;
+                $transaction->save();
+
+                $transaction = New Transaction;
+        
+                $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
+                $transaction->customer_id = $request->customer_id;
+                $transaction->room_id = $request->room_id;
+                $transaction->roomtype_id = $request->roomtype_id;
+                $transaction->arrival = $en_arrival;
+                $transaction->departure = $en_departure;
+                $transaction->description = $description;
+                $transaction->amount = $balance;
+                $transaction->status = 0;
+                $transaction->save();
+
+            }
+        }
 
         // TRANSACTION END
 
@@ -281,7 +317,7 @@ class ReservationCrudController extends CrudController
             'rate_id'              =>             ["required", "not_regex:(---)"],
             'arrival'              =>             'required',
             'departure'            =>             'required',
-            'adults'               =>             'required'
+            'payment'              =>             'required'
         ]);
 
         $reservation = Reservation::find($request->reservation_id);
@@ -298,14 +334,7 @@ class ReservationCrudController extends CrudController
         $reservation->rate_id = $request->rate_id;
         $reservation->arrival = $en_arrival;
         $reservation->departure = $en_departure;
-        $reservation->adults = $request->adults;
-        if ($request->has('early_checkin')) {
-            $reservation->early_checkin = 1;
-        }
-
-        if ($request->has('late_checkout')) {
-            $reservation->late_checkout = 1;
-        }
+        $reservation->payment = $request->payment;
 
         if ($request->has('notes')) {
             $reservation->notes = $request->notes;
@@ -320,18 +349,54 @@ class ReservationCrudController extends CrudController
         // UPDATE TRANSACTION
         $room = Room::find($request->room_id);
         $roomtype = Roomtype::find($request->roomtype_id);
-        $transaction = Transaction::where([['customer_id', $old_customerID], ['room_id', $old_roomID], ['roomtype_id', $old_roomtypeID], ['arrival', $old_arrival], ['departure', $old_departure]])->first();
+        
         $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
 
-        $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
-        $transaction->customer_id = $request->customer_id;
-        $transaction->room_id = $request->room_id;
-        $transaction->roomtype_id = $request->roomtype_id;
-        $transaction->arrival = $en_arrival;
-        $transaction->departure = $en_departure;
-        $transaction->description = $description;
-        $transaction->amount = $roomrate->price;
-        $transaction->save();
+        if (!$request->payment == '') {
+            if ($request->payment == $roomrate->price) {
+                $transaction = Transaction::where([['customer_id', $old_customerID], ['room_id', $old_roomID], ['roomtype_id', $old_roomtypeID], ['arrival', $old_arrival], ['departure', $old_departure]])->first();
+
+                $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
+                $transaction->customer_id = $request->customer_id;
+                $transaction->room_id = $request->room_id;
+                $transaction->roomtype_id = $request->roomtype_id;
+                $transaction->arrival = $en_arrival;
+                $transaction->departure = $en_departure;
+                $transaction->description = $description;
+                $transaction->amount = $roomrate->price;
+                $transaction->status = 1;
+                $transaction->save();
+            }
+            else {
+                $balance = $roomrate->price - $request->payment;
+                $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename. ' (Paid: ' .$request->payment. ', Balance: '. $balance. ')';
+
+                $transaction = New Transaction;
+                $transaction->customer_id = $request->customer_id;
+                $transaction->room_id = $request->room_id;
+                $transaction->roomtype_id = $request->roomtype_id;
+                $transaction->description = $description;
+                $transaction->amount = $request->payment;
+                $transaction->status = 1;
+                $transaction->save();
+
+
+
+                $transaction = Transaction::where([['customer_id', $old_customerID], ['room_id', $old_roomID], ['roomtype_id', $old_roomtypeID], ['arrival', $old_arrival], ['departure', $old_departure]])->first();
+
+                $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
+                $transaction->customer_id = $request->customer_id;
+                $transaction->room_id = $request->room_id;
+                $transaction->roomtype_id = $request->roomtype_id;
+                $transaction->arrival = $en_arrival;
+                $transaction->departure = $en_departure;
+                $transaction->description = $description;
+                $transaction->amount = $balance;
+                $transaction->status = 0;
+                $transaction->save();
+
+            }
+        }
 
         // show a success message
         \Alert::success('The item has been modified successfully.')->flash();
@@ -362,6 +427,15 @@ class ReservationCrudController extends CrudController
         foreach ($rateArr as $row) {
             $html .= '<option value="'.$row->id.'"> ' .$row->ratecode. ' </option>';
         }
+
+        return $html;
+    }
+
+    public function getprice($rate_id, $roomtype_id) {
+        $roomrate = Roomrate::where([['rate_id', $rate_id], ['roomtype_id', $roomtype_id]])->first();
+
+
+        $html = '<label id="price_label">Room Price</label><input type="text" id="price_input" class="form-control" value="'.$roomrate->price.'" disabled >';
 
         return $html;
     }
@@ -569,6 +643,109 @@ class ReservationCrudController extends CrudController
         // $html .= '</select>';
 
         return $html;
+
+    }
+
+    public function expectedGuests() {
+        $reservations = Reservation::whereDate('arrival', Carbon::today())->whereNull('check_in')->get();
+        $reservationArr = [];
+        $x = 0;
+
+        foreach ($reservations as $row) {
+            $customer = Customer::where('customer_id', $row->customer_id)->first();
+            $roomtype = Roomtype::find($row->roomtype_id);
+            $room = Room::find($row->room_id);
+            $rate = Rate::find($row->rate_id);
+            $reservationArr[$x++] = [
+                'id' => $row->id,
+                'reservation_code' => $row->reservation_code,
+                'customer_id' => $row->customer_id,
+                'customer_name' => $customer->firstname. ' ' .$customer->lastname,
+                'roomtype_id' => $row->roomtype_id,
+                'roomtypecode' => $roomtype->typecode,
+                'room_id' => $row->room_id,
+                'roomcode' => $room->roomcode,
+                'rate_id' => $row->rate_id,
+                'ratecode' => $rate->ratecode,
+                'arrival' => date('d F Y', strtotime($row->arrival)),
+                'departure' => date('d F Y', strtotime($row->departure)),
+                'check_in' => $row->check_in,
+                'check_out' => $row->check_out,
+                'payment' => $row->payment,
+                'notes' => $row->notes,
+                'additional_information' => $row->additional_information,
+                'created_at' => $row->created_at,
+                'updated_at' => $row->updated_at
+            ];
+        }
+
+        $reservationArr = json_decode(json_encode($reservationArr));
+
+        return view('reservations.expected-guests')
+            ->with('reservations', $reservationArr);
+    }
+
+    public function checkIn($id) {
+        $reservation = Reservation::find($id);
+        $dateToday = date('Y-m-d H:i:s');
+
+        $reservation->check_in = $dateToday;
+        $reservation->save();
+
+        \Alert::success('Checked in successfully.')->flash();
+        return redirect()->back();
+    }
+
+    public function checkOut($id) {
+        $reservation = Reservation::find($id);
+        $dateToday = date('Y-m-d H:i:s');
+
+        $reservation->check_out = $dateToday;
+        $reservation->save();
+
+        \Alert::success('Checked out successfully.')->flash();
+        return redirect()->route('customer.unpaid', $reservation->customer_id);
+    }
+
+    public function guestsToday() {
+        $reservations = Reservation::all();
+        $reservationArr = [];
+        $x = 0;
+
+        foreach ($reservations as $row) {
+            if (!($row->check_in == '') && ($row->check_out == '')) {
+                $customer = Customer::where('customer_id', $row->customer_id)->first();
+                $roomtype = Roomtype::find($row->roomtype_id);
+                $room = Room::find($row->room_id);
+                $rate = Rate::find($row->rate_id);
+                $reservationArr[$x++] = [
+                    'id' => $row->id,
+                    'reservation_code' => $row->reservation_code,
+                    'customer_id' => $row->customer_id,
+                    'customer_name' => $customer->firstname. ' ' .$customer->lastname,
+                    'roomtype_id' => $row->roomtype_id,
+                    'roomtypecode' => $roomtype->typecode,
+                    'room_id' => $row->room_id,
+                    'roomcode' => $room->roomcode,
+                    'rate_id' => $row->rate_id,
+                    'ratecode' => $rate->ratecode,
+                    'arrival' => date('d F Y', strtotime($row->arrival)),
+                    'departure' => date('d F Y', strtotime($row->departure)),
+                    'check_in' => $row->check_in,
+                    'check_out' => $row->check_out,
+                    'payment' => $row->payment,
+                    'notes' => $row->notes,
+                    'additional_information' => $row->additional_information,
+                    'created_at' => $row->created_at,
+                    'updated_at' => $row->updated_at
+                ];
+            }
+        }
+
+        $reservationArr = json_decode(json_encode($reservationArr));
+
+        return view('reservations.guests-today')
+            ->with('reservations', $reservationArr);
 
     }
 }

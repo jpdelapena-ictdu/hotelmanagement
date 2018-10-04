@@ -12,12 +12,20 @@
 */
 
 Route::get('/', function () {
-    return redirect()->route('login');
+    return redirect()->route('admin.login');
 });
 
-Auth::routes();
+// Auth::routes();
 
-Route::get('/home', 'HomeController@index')->name('home');
+// Admin Login
+Route::get('/admin/logout', 'Auth\AdminLoginController@adminLogout')->name('admin.logout');
+Route::get('/admin/login', 'Auth\AdminLoginController@showLoginForm')->name('admin.login');
+Route::post('/admin/login', 'Auth\AdminLoginController@login')->name('admin.login.submit');
+// Route::get('/admin', 'Auth\AdminLoginController@redirect')->name('redirect-admin-login');
+
+// Route::get('/home', 'HomeController@index')->name('home');
+
+
 
 
 

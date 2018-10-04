@@ -16,10 +16,10 @@ class CreateTransactionsTable extends Migration
         Schema::create('transactions', function (Blueprint $table) {
             $table->increments('id');
             $table->string('customer_id');
-            $table->string('room_id');
-            $table->string('roomtype_id');
-            $table->date('arrival');
-            $table->date('departure');
+            $table->string('room_id')->nullable();
+            $table->string('roomtype_id')->nullable();
+            $table->date('arrival')->nullable();
+            $table->date('departure')->nullable();
             $table->text('description');
             $table->integer('amount');
             $table->boolean('status');

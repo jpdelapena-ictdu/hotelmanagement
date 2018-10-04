@@ -45,13 +45,15 @@
                 <thead>
                     <tr>
                         <th>Description</th>
+                        <th>Date</th>
                         <th>Amount</th>
                     </tr>                    
                 </thead>
                 <tbody>
                   @foreach($unpaidTransactions as $row)
                     <tr>
-                        <td style="width: 80%;">{{ $row->description }}</td>
+                        <td style="width: 50%;">{{ $row->description }}</td>
+                        <td style="width: 30%;">{{ $row->created_at->toDayDateTimeString() }}</td>
                         <td id="amount">{{ $row->amount }}</td>
                     </tr>
                     @endforeach
@@ -97,7 +99,7 @@
 
     table.find('tr').each(function() {
       var $tds = $(this).find('td'),
-          amount = $tds.eq(1).text();
+          amount = $tds.eq(2).text();
           amount = parseInt(amount);
 
           total = total + amount;

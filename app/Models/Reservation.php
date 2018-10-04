@@ -22,7 +22,7 @@ class Reservation extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['reservation_code', 'customer_id', 'roomtype_id', 'room_id', 'rate_id', 'arrival', 'departure', 'adults', 'early_checkin', 'late_checkout', 'notes', 'additional_information'];
+    protected $fillable = ['reservation_code', 'customer_id', 'roomtype_id', 'room_id', 'rate_id', 'arrival', 'departure', 'adults', 'check_in', 'check_out', 'payment', 'notes', 'additional_information'];
     // protected $hidden = [];
     // protected $dates = [];
 
@@ -31,6 +31,16 @@ class Reservation extends Model
     | FUNCTIONS
     |--------------------------------------------------------------------------
     */
+
+    public function openGoogle($crud = false)
+    {
+        return '<a class="btn btn-primary" target="_blank" href="guests-today" data-toggle="tooltip" title="Just a demo custom button."><i class="fa fa-users"></i> Guests Today</a>';
+    }
+
+    public function expectedGuests($crud = false)
+    {
+        return '<a class="btn btn-primary" target="_blank" href="expected-guests" data-toggle="tooltip" title="View expected guests."><i class="fa fa-users"></i> Expected Guests</a>';
+    }
 
     /*
     |--------------------------------------------------------------------------
@@ -86,7 +96,7 @@ class Reservation extends Model
         return $this->notes;
     }
 
-    public function getEarlyInAttribute($value){
+    /*public function getEarlyInAttribute($value){
         if ($this->early_checkin == 1) {
             return 'TRUE';
         }
@@ -98,7 +108,7 @@ class Reservation extends Model
             return 'TRUE';
         }
         return 'FALSE';
-    }
+    }*/
 
     /*
     |--------------------------------------------------------------------------

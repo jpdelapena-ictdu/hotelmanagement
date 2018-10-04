@@ -20,6 +20,8 @@
 		</ul>
 </li>
 <li><a href="{{ backpack_url('customer') }}"><i class="fa fa-bed"></i> <span>Customers</span></a></li>
-<li><a href="{{ backpack_url('reservation') }}"><i class="fa fa-dashboard"></i> <span>Reservations</span></a></li>
+<li><a href="{{ backpack_url('reservation') }}"><i class="fa fa-home"></i> <span>Reservations</span></a></li>
+<li><a href="{{ backpack_url('service') }}"><i class="fa fa-cogs"></i> <span>Services</span></a></li>
+<li><a href="{{ route('transaction.list') }}"><i class="fa fa-list-alt"></i> <span>Transactions</span></a></li>
 
 

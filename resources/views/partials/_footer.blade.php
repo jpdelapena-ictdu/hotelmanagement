@@ -24,24 +24,7 @@
           </div>
           <div class="col-lg-6 h-100 text-center text-lg-right my-auto">
             
-              @if(Auth::check())
-              <div class="dropdown">
-                <span>{{ Auth::user()->name }}</span>
-              <div>
-                  <a class="dropdown-content" href="{{ route('logout') }}"
-                                       onclick="event.preventDefault();
-                                                     document.getElementById('logout-form').submit();">
-                                        {{ __('Log Out') }}
-                                    </a>
-
-                                    <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
-                                        @csrf
-                                    </form>
-                </div>
-            </div>
-              @else
-              <a href="{{ route('login') }}" class="btn btn-default"> Login </a>
-              @endif
+              
             </div>
           </div>
         </div>

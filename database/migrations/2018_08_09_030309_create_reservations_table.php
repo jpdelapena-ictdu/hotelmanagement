@@ -22,9 +22,12 @@ class CreateReservationsTable extends Migration
             $table->integer('rate_id');
             $table->date('arrival');
             $table->date('departure');
-            $table->integer('adults');
-            $table->boolean('early_checkin')->nullable();
-            $table->boolean('late_checkout')->nullable();
+            // $table->integer('adults')->nullable();
+            $table->string('check_in')->nullable();
+            $table->string('check_out')->nullable();
+            $table->integer('payment')->nullable();
+            // $table->boolean('early_checkin')->nullable();
+            // $table->boolean('late_checkout')->nullable();
             $table->text('notes')->nullable();
             $table->text('additional_information')->nullable();
             $table->timestamps();

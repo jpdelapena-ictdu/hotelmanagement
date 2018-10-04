@@ -27,6 +27,13 @@ class CustomerRequest extends FormRequest
     {
         return [
             // 'name' => 'required|min:5|max:255'
+            'firstname' => 'required|max:255',
+            'lastname' => 'required|max:255',
+            'title' => 'max:255',
+            'dateofbirth' => 'required',
+            'phone' => 'required',
+            'company' => 'required|max:255',
+            'address' => 'required|max:255'
         ];
     }
 

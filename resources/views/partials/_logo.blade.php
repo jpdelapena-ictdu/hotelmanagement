@@ -1,6 +1,6 @@
 <div class="container">
     <div class="row">
-        <img src="img/chmlogo.png" class="chmlogo containerlogo">
+        <img src="{{ asset('img/chmlogo.png') }}" class="chmlogo containerlogo">
     </div>
 </div>
 

@@ -90,7 +90,7 @@
                 	</select>
                 </div>
 
-                <div class="form-group col-xs-6">
+                <div class="form-group col-xs-4">
     				<label>Rate</label>
     				<select name="rate_id" class="form-control select2_from_array">
         				<option>---</option>
@@ -100,28 +100,15 @@
                     </select>
             	</div>
 
-                <div class="form-group col-xs-6">
-   					<label>Adults</label>
-   					<input type="text" name="adults" value="{{$reservation->adults}}" class="form-control">
+            	<div class="form-group col-xs-4" id="price_div">
+   					<label id="price_label">Room Price</label>
+   					<input type="text" name="price" id="price_input" class="form-control" disabled>
           		</div>
 
-          		<div class="form-group col-xs-12">
-        			<div class="col-xs-6">
-        				<div class="checkbox">
-	    					<label>
-	    	  					<input type="checkbox" value="1" name="early_checkin" @if($reservation->early_checkin == 1) checked @endif>Early Check In
-	    					</label>
-						</div>
-        			</div>
-        			<div class="col-xs-6">
-        				<div class="checkbox">
-	    					<label>
-	    	  					<input type="checkbox" value="1" name="late_checkout" @if($reservation->late_checkout == 1) checked @endif>Late Check Out
-	    					</label>
-						</div>
-        			</div>
-
-				</div>
+            	<div class="form-group col-xs-4">
+   					<label>Payment</label>
+   					<input type="text" name="payment" value="{{ $reservation->payment }}" class="form-control">
+          		</div>
 
           		<div class="form-group col-xs-12">
    					<label>Notes</label>
@@ -192,6 +179,26 @@ $(document).ready(function() {
  				// console.log(data);
  			}
  		});/*get room*/
+
+ 	// rate on change
+
+		$rate_id = $("select[name='rate_id']").val();
+		$roomtype_id = $("select[name='roomtype_id']").val();
+
+		$("input").remove( "#price_input" );
+	  	$("label").remove( "#price_label" );
+
+	  	// console.log($rate_id + " " + $roomtype_id);
+	  	$.ajax
+ 		({
+ 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id,
+ 			type: 'GET',
+ 			dataType: 'html',
+ 			success: function(data)
+ 			{
+ 				$("#price_div").append(data);
+ 			}
+ 		});
 
 });
 </script>
@@ -287,6 +294,32 @@ $("select[name='roomtype_id']").change(function(e)
 	   // return value.getMonth()+1 + "/" + value.getDate() + "/" + value.getYear();
 	   return ((date.getMonth() + 1) + '/' + date.getDate() + '/' +  date.getFullYear());
 	}
+
+	// rate on change
+   	$("select[name='rate_id']").change(function(e)
+	{
+	 	e.preventDefault();
+
+		$rate_id = $(this).val();
+		$roomtype_id = $("select[name='roomtype_id']").val();
+
+		$("input").remove( "#price_input" );
+	  	$("label").remove( "#price_label" );
+
+	  	// console.log($rate_id + " " + $roomtype_id);
+	  	$.ajax
+ 		({
+ 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id,
+ 			type: 'GET',
+ 			dataType: 'html',
+ 			success: function(data)
+ 			{
+ 				$("#price_div").append(data);
+ 			}
+ 		});
+		
+	  	
+	});
 
 
 </script>
