@@ -13,6 +13,10 @@
 
 Route::get('/', function () {
     return redirect()->route('admin.login');
+})->name('dash');
+
+Route::get('/home', function () {
+    return redirect()->route('backpack.dashboard');
 });
 
 // Auth::routes();
