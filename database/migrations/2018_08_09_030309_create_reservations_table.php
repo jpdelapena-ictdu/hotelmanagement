@@ -26,6 +26,7 @@ class CreateReservationsTable extends Migration
             $table->string('check_in')->nullable();
             $table->string('check_out')->nullable();
             $table->integer('payment')->nullable();
+            $table->integer('discount')->nullable();
             // $table->boolean('early_checkin')->nullable();
             // $table->boolean('late_checkout')->nullable();
             $table->text('notes')->nullable();

@@ -84,21 +84,34 @@
                 	</select>
                 </div>
 
-                <div class="form-group col-xs-4">
+                <div class="form-group col-xs-3">
                 	<label id="rate_label">Rate</label>
                 	<select id="rate_select" name="rate_id" class="form-control" disabled>
                 		
                 	</select>
                 </div>
 
-                <div class="form-group col-xs-4" id="price_div">
+                <div class="form-group col-xs-3" id="price_div">
    					<label id="price_label">Room Price</label>
    					<input type="text" name="price" id="price_input" class="form-control" disabled>
           		</div>
 
-            	<div class="form-group col-xs-4">
+            	<div class="form-group col-xs-2">
    					<label>Payment</label>
    					<input type="text" name="payment" value="" class="form-control">
+          		</div>	
+
+          		<div id="discount_div" class="form-group col-xs-2">
+   					<label>Discount</label>
+   					<div class="input-group">
+				      <input type="text" class="form-control" id="discount" name="discount">
+				      <div class="input-group-addon" id="discountBtn">%</div>
+				    </div>
+          		</div>
+
+          		<div class="col-xs-2">
+          			<label>Total</label>
+          			<input type="text" name="total" id="total" class="form-control" disabled>
           		</div>	
 
           		<div class="form-group col-xs-12">
@@ -146,6 +159,22 @@
 
 {{-- roomtype onchange --}}
 <script>
+
+
+$("#discount").on('change keyup paste', function() {
+    var price = $('#price_input').val();
+    var discount = $('#discount').val();
+    var discountedPrice = (price * discount) / 100;
+    discountedPrice = price - discountedPrice;
+
+    $('#total').val(discountedPrice);
+});
+
+/*$('#discountBtn').on('click', function() {
+	$("#discount_div").toggleClass('col-xs-3 col-xs-2');
+	$('#discount_div').after('<div class="col-xs-1"><label>Total</label><input type="text" class="form-control" disabled></div>');
+});*/
+
 $("select[name='roomtype_id']").change(function(e)
 {
  	e.preventDefault();
@@ -264,7 +293,11 @@ $("select[name='roomtype_id']").change(function(e)
  				$("#price_div").append(data);
  			}
  		});
-		
+
+ 		setTimeout(function () {
+            var t = $('#price_input').val();
+			$('#total').val(t);
+          }, 1000);
 	  	
 	});
 

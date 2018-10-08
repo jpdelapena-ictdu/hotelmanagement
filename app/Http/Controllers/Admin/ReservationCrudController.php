@@ -249,9 +249,11 @@ class ReservationCrudController extends CrudController
         $room = Room::find($request->room_id);
         $roomtype = Roomtype::find($request->roomtype_id);
         $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
+        $total = ($roomrate->price * $request->discount) / 100;
+        $total = $roomrate->price - $total;
 
         if (!$request->payment == '') {
-            if ($request->payment == $roomrate->price) {
+            if ($request->payment == $total) {
 
                 $transaction = New Transaction;
         
@@ -262,13 +264,14 @@ class ReservationCrudController extends CrudController
                 $transaction->arrival = $en_arrival;
                 $transaction->departure = $en_departure;
                 $transaction->description = $description;
-                $transaction->amount = $roomrate->price;
+                $transaction->amount = $request->payment;
+                // $transaction->discount = $request->discount;
                 $transaction->status = 1;
                 $transaction->save();
 
             }
             else {
-                $balance = $roomrate->price - $request->payment;
+                $balance = $total - $request->payment;
                 $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename. ' (Paid: ' .$request->payment. ', Balance: '. $balance. ')';
                 $transaction = New Transaction;
 
@@ -277,6 +280,7 @@ class ReservationCrudController extends CrudController
                 $transaction->roomtype_id = $request->roomtype_id;
                 $transaction->description = $description;
                 $transaction->amount = $request->payment;
+                // $transaction->discount = $request->discount;
                 $transaction->status = 1;
                 $transaction->save();
 
@@ -290,6 +294,7 @@ class ReservationCrudController extends CrudController
                 $transaction->departure = $en_departure;
                 $transaction->description = $description;
                 $transaction->amount = $balance;
+                // $transaction->discount = $request->discount;
                 $transaction->status = 0;
                 $transaction->save();
 
@@ -335,6 +340,7 @@ class ReservationCrudController extends CrudController
         $reservation->arrival = $en_arrival;
         $reservation->departure = $en_departure;
         $reservation->payment = $request->payment;
+        $reservation->discount = $request->discount;
 
         if ($request->has('notes')) {
             $reservation->notes = $request->notes;
@@ -351,9 +357,11 @@ class ReservationCrudController extends CrudController
         $roomtype = Roomtype::find($request->roomtype_id);
         
         $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
+        $total = ($roomrate->price * $request->discount) / 100;
+        $total = $roomrate->price - $total;
 
         if (!$request->payment == '') {
-            if ($request->payment == $roomrate->price) {
+            if ($request->payment == $total) {
                 $transaction = Transaction::where([['customer_id', $old_customerID], ['room_id', $old_roomID], ['roomtype_id', $old_roomtypeID], ['arrival', $old_arrival], ['departure', $old_departure]])->first();
 
                 $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename;
@@ -368,7 +376,7 @@ class ReservationCrudController extends CrudController
                 $transaction->save();
             }
             else {
-                $balance = $roomrate->price - $request->payment;
+                $balance = $total - $request->payment;
                 $description = 'Room ' .$room->roomcode. ' ' .$roomtype->typename. ' (Paid: ' .$request->payment. ', Balance: '. $balance. ')';
 
                 $transaction = New Transaction;

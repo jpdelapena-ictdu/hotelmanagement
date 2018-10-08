@@ -22,7 +22,7 @@ class Reservation extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['reservation_code', 'customer_id', 'roomtype_id', 'room_id', 'rate_id', 'arrival', 'departure', 'adults', 'check_in', 'check_out', 'payment', 'notes', 'additional_information'];
+    protected $fillable = ['reservation_code', 'customer_id', 'roomtype_id', 'room_id', 'rate_id', 'arrival', 'departure', 'adults', 'check_in', 'check_out', 'payment', 'discount','notes', 'additional_information'];
     // protected $hidden = [];
     // protected $dates = [];
 

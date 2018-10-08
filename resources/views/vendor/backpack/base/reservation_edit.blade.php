@@ -90,7 +90,7 @@
                 	</select>
                 </div>
 
-                <div class="form-group col-xs-4">
+                <div class="form-group col-xs-3">
     				<label>Rate</label>
     				<select name="rate_id" class="form-control select2_from_array">
         				<option>---</option>
@@ -100,15 +100,28 @@
                     </select>
             	</div>
 
-            	<div class="form-group col-xs-4" id="price_div">
+            	<div class="form-group col-xs-3" id="price_div">
    					<label id="price_label">Room Price</label>
    					<input type="text" name="price" id="price_input" class="form-control" disabled>
           		</div>
 
-            	<div class="form-group col-xs-4">
+            	<div class="form-group col-xs-2">
    					<label>Payment</label>
    					<input type="text" name="payment" value="{{ $reservation->payment }}" class="form-control">
           		</div>
+
+          		<div id="discount_div" class="form-group col-xs-2">
+   					<label>Discount</label>
+   					<div class="input-group">
+				      <input type="text" class="form-control" value="{{ $reservation->discount }}" id="discount" name="discount">
+				      <div class="input-group-addon" id="discountBtn">%</div>
+				    </div>
+          		</div>
+
+          		<div class="col-xs-2">
+          			<label>Total</label>
+          			<input type="text" name="total" id="total" class="form-control" disabled>
+          		</div>	
 
           		<div class="form-group col-xs-12">
    					<label>Notes</label>
@@ -200,6 +213,25 @@ $(document).ready(function() {
  			}
  		});
 
+ 	// get total on load
+ 	setTimeout(function () {
+ 		var price = $('#price_input').val();
+	    var discount = $('#discount').val();
+	    var discountedPrice = (price * discount) / 100;
+	    discountedPrice = price - discountedPrice;
+
+	    $('#total').val(discountedPrice);
+	}, 2000);
+
+});
+
+$("#discount").on('change keyup paste', function() {
+    var price = $('#price_input').val();
+    var discount = $('#discount').val();
+    var discountedPrice = (price * discount) / 100;
+    discountedPrice = price - discountedPrice;
+
+    $('#total').val(discountedPrice);
 });
 </script>
 
