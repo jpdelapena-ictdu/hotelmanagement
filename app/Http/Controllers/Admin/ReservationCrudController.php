@@ -7,6 +7,7 @@ use Backpack\CRUD\app\Http\Controllers\CrudController;
 // VALIDATION: change the requests to match your own file names if you need form validation
 use App\Http\Requests\ReservationRequest as StoreRequest;
 use App\Http\Requests\ReservationRequest as UpdateRequest;
+use Illuminate\Http\Request;
 use App\Models\Roomtype;
 use App\Models\Rate;
 use App\Models\Customer;
@@ -704,15 +705,25 @@ class ReservationCrudController extends CrudController
         return redirect()->back();
     }
 
-    public function checkOut($id) {
-        $reservation = Reservation::find($id);
+    public function checkOut(Request $request) {
+        $reservation = Reservation::find($request->reservation_id);
         $dateToday = date('Y-m-d H:i:s');
 
         $reservation->check_out = $dateToday;
         $reservation->save();
 
+        foreach ($_POST as $key => $value) {
+            if (strpos($key, 'transaction') !== false) {
+                $transaction = Transaction::find($value);
+                $transaction->status = 1;
+                $transaction->save();
+            }
+        }
+
         \Alert::success('Checked out successfully.')->flash();
-        return redirect()->route('customer.unpaid', $reservation->customer_id);
+        return redirect()->route('customer.paid', $reservation->customer_id);
+
+        // print_r($_POST);
     }
 
     public function guestsToday() {
@@ -755,5 +766,13 @@ class ReservationCrudController extends CrudController
         return view('reservations.guests-today')
             ->with('reservations', $reservationArr);
 
+    }
+
+    public function customerCheckOut($id) {
+        // $customer = Transaction::where('customer_id', $id)->get();
+        $reservation = Reservation::find($id);
+        $customer = Transaction::where([['customer_id', $reservation->customer_id], ['status', 0]])->get();
+
+        return $customer;
     }
 }

@@ -74,10 +74,7 @@
                   		<td>{{ $row->payment }}</td>
                   		<td>{{ $row->notes }}</td>
                   		<td>{{ $row->additional_information }}</td>
-                  		<td><button form="checkOutForm{{ $row->id }}" class="btn btn-xs btn-success"><i class="fa fa-sign-out"></i> Check out</button>
-
-						<form onsubmit="return confirmCheckIn()" id="checkOutForm{{ $row->id }}" method="POST" action="{{ route('check-out', $row->id) }}">
-							{{ csrf_field() }}
+                  		<td><a href="#" id="checkOutBtn" data-id="{{ $row->id }}" class="btn btn-xs btn-success"><i class="fa fa-sign-out"></i> Check out</a>
 
 						</form></td>
                   	</tr>
@@ -85,6 +82,42 @@
                 </tbody>
             </table>
 
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="myModal" tabindex="-1" role="dialog" aria-labelledby="myModalLabel">
+      <div class="modal-dialog" role="document">
+        <div class="modal-content">
+          <div class="modal-header">
+            <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+            <h4 class="modal-title" id="myModalLabel">TITLE</h4>
+          </div>
+          <div class="modal-body">
+            <div class="container">
+              <form method="POST" id="billOutForm">
+                {{ csrf_field() }}
+                <div id="checkoutDiv">
+                  <table id="billTable">
+                    <thead>
+                      <tr>
+                        <th></th>
+                        <th>Amount</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      
+                    </tbody>
+                  </table>
+                </div>
+              </form>
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+            <button type="submit" class="btn btn-primary" form="billOutForm" formaction="{{ route('check-out') }}">Bill Out</button>
+          </div>
         </div>
       </div>
     </div>
@@ -103,6 +136,8 @@
   <script src="https://cdn.datatables.net/responsive/2.2.1/js/responsive.bootstrap.min.js"></script>
 
 <script>
+
+
     $(document).ready( function () {
         $('#reservationTable').DataTable({
         	"iDisplayLength": 50,
@@ -110,14 +145,35 @@
         });
     } );
 
-	function confirmCheckIn()
-	{
-		var x = confirm("Confirm Check-In.");
-		if (x)
-		return true;
-		else
-		return false;
-	}   
+    $('body').delegate('#checkOutBtn', 'click', function(e) {
+      var id = $(this).data('id');
+
+      $.ajax({
+        url: '{{ url('admin/checkoutcustomer') }}/'+id,
+        type: 'GET',
+        dataType: "JSON",
+        success: function (data)
+        {
+          var dataLength = data.length;
+          var html = '';
+          var total = 0;
+          for(var i = 0; i < dataLength; i++) {
+            console.log(data[i]['description']);
+            html += '<tr><th style="width: 90%;">'+data[i]['description']+'</th><td style="width: 10%;">'+data[i]['amount']+'</td></tr><input type="hidden" name="transaction'+data[i]['id']+'" value="'+data[i]['id']+'">';
+            total = total + data[i]['amount'];
+          }
+
+          html += '<tr><th style="width: 90%;">Total</th><th style="width: 10%;">'+total+'</th><input type="hidden" value="'+id+'" name="reservation_id"></tr>';
+           console.log(html);
+           jQuery.noConflict();
+           $('#myModal').modal('show')
+           $('#billTable tbody').append(html);
+        }
+      });
+
+      // $('#billTable tbody').empty();
+
+    });
 
 </script>
 @endsection

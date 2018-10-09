@@ -24,10 +24,11 @@ Route::group([
 	CRUD::resource('reservation', 'ReservationCrudController');
 	CRUD::resource('service', 'ServiceCrudController');
 
+	Route::get('checkoutcustomer/{id}', 'ReservationCrudController@customerCheckOut')->name('customer.checkout');
 	Route::get('expected-guests', 'ReservationCrudController@expectedGuests')->name('expected-guests');
 	Route::get('guests-today', 'ReservationCrudController@guestsToday')->name('guests-today');
 	Route::post('checkin/{id}', 'ReservationCrudController@checkIn')->name('check-in');
-	Route::post('checkout/{id}', 'ReservationCrudController@checkOut')->name('check-out');
+	Route::post('checkout', 'ReservationCrudController@checkOut')->name('check-out');
 	Route::get('/customer/{id}/transactions', 'CustomerCrudController@unpaidTransaction')->name('customer.unpaid');
 	Route::get('/transactions', 'TransactionController@list')->name('transaction.list');
 	Route::get('/customer/{id}/paid-transactions', 'CustomerCrudController@paidTransaction')->name('customer.paid');
