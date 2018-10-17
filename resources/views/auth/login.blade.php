@@ -30,7 +30,7 @@
     <div class="side-top-bottom"></div>
     <div class="side-left-right"></div>
   </button>
-  <small><a href="#">Forgot Password</small>
+  <small><a href="#"></small>
   </form>
 </div>
 </div>
