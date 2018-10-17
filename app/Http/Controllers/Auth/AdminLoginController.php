@@ -38,7 +38,7 @@ class AdminLoginController extends Controller
             // show a success message
             \Alert::success('Successfully logged in')->flash();
 
-            return redirect()->intended(route('backpack.dashboard'));
+            return redirect()->intended(route('admin.dashboard'));
         } else {
             Session::flash('userNotFound', 'Invalid email/password');
             return redirect()->back()->withInput($request->only('email', 'remember'));

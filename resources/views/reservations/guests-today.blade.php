@@ -171,7 +171,7 @@
         }
       });
 
-      // $('#billTable tbody').empty();
+      $('#billTable tbody').empty();
 
     });
 

@@ -23,7 +23,11 @@ Route::group([
 	CRUD::resource('amenity', 'AmenityCrudController');
 	CRUD::resource('reservation', 'ReservationCrudController');
 	CRUD::resource('service', 'ServiceCrudController');
+	Route::resource('users', 'UserController');
 
+	Route::get('dashboard', 'AdminDashboardController@dashboard')->name('admin.dashboard');
+	
+	Route::get('logs', 'LogController@list')->name('log.list');
 	Route::get('checkoutcustomer/{id}', 'ReservationCrudController@customerCheckOut')->name('customer.checkout');
 	Route::get('expected-guests', 'ReservationCrudController@expectedGuests')->name('expected-guests');
 	Route::get('guests-today', 'ReservationCrudController@guestsToday')->name('guests-today');
@@ -35,7 +39,7 @@ Route::group([
 	Route::get('/room/calendar/{id}', 'RoomCrudController@roomCalendar')->name('room.calendar');
 
 	Route::get('getrate/{roomtype_id}', 'ReservationCrudController@getrate');
-	Route::get('getprice/{rate_id}/{roomtype_id}', 'ReservationCrudController@getprice');
+	Route::get('getprice/{rate_id}/{roomtype_id}/{dm}/{dd}/{dy}/{am}/{ad}/{ay}', 'ReservationCrudController@getprice');
 	Route::get('getroomtype/{dm}/{dd}/{dy}/{am}/{ad}/{ay}', 'ReservationCrudController@getroomtype');
 	Route::get('getroom/{val}/{dm}/{dd}/{dy}/{am}/{ad}/{ay}', 'ReservationCrudController@getroom');
 	Route::get('edit/getroom/{val}/{room_id}/{dm}/{dd}/{dy}/{am}/{ad}/{ay}', 'ReservationCrudController@editgetroom');

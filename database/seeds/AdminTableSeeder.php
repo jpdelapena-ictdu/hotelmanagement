@@ -13,8 +13,9 @@ class AdminTableSeeder extends Seeder
     {
         DB::table('users')->insert([
             'name' => str_random(10),
-            'email' => 'admin@spcf-partners.com',
+            'email' => 'admin@spcf.com',
             'password' => bcrypt('admin1234'),
+            'role' => 1,
         ]);
     }
 }

@@ -16,7 +16,7 @@ Route::get('/', function () {
 })->name('dash');
 
 Route::get('/home', function () {
-    return redirect()->route('backpack.dashboard');
+    return redirect()->route('admin.dashboard');
 });
 
 // Auth::routes();

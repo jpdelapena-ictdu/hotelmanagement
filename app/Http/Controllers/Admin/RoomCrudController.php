@@ -184,7 +184,7 @@ class RoomCrudController extends CrudController
     }
 
     public function roomCalendar($id) {
-        $reservation = Reservation::where('room_id', $id)->get();
+        $reservation = Reservation::where('room_id', $id)->whereNull('check_out')->get();
         $room = Room::find($id);
         $x = 0;
         $reservationArr = [];

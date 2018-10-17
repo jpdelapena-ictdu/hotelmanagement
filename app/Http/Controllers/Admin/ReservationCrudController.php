@@ -16,6 +16,7 @@ use App\Models\Room;
 use App\Billing;
 use App\Models\Roomrate;
 use App\Transaction;
+use App\Log;
 use DateTime;
 use DateInterval;
 use DatePeriod;
@@ -247,11 +248,20 @@ class ReservationCrudController extends CrudController
 
         // TRANSACTION
 
+        $arrival_date = strtotime($request->arrival);
+        $departure_date = strtotime($request->departure);
+        $datediff = $departure_date - $arrival_date;
+        $night = round($datediff / (60 * 60 * 24));
+
         $room = Room::find($request->room_id);
         $roomtype = Roomtype::find($request->roomtype_id);
         $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
-        $total = ($roomrate->price * $request->discount) / 100;
-        $total = $roomrate->price - $total;
+        $roomprice = $roomrate->price;
+        if ($night > 1) {
+            $roomprice = $roomprice * $night;
+        }
+        $total = ($roomprice * $request->discount) / 100;
+        $total = $roomprice - $total;
 
         if (!$request->payment == '') {
             if ($request->payment == $total) {
@@ -354,12 +364,21 @@ class ReservationCrudController extends CrudController
         $reservation->save();
 
         // UPDATE TRANSACTION
+        $arrival_date = strtotime($request->arrival);
+        $departure_date = strtotime($request->departure);
+        $datediff = $departure_date - $arrival_date;
+        $night = round($datediff / (60 * 60 * 24));
+
         $room = Room::find($request->room_id);
         $roomtype = Roomtype::find($request->roomtype_id);
         
         $roomrate = Roomrate::where([['rate_id', $request->rate_id], ['roomtype_id', $request->roomtype_id]])->first();
-        $total = ($roomrate->price * $request->discount) / 100;
-        $total = $roomrate->price - $total;
+        $roomprice = $roomrate->price;
+        if ($night > 1) {
+            $roomprice = $roomprice * $night;
+        }
+        $total = ($roomprice * $request->discount) / 100;
+        $total = $roomprice - $total;
 
         if (!$request->payment == '') {
             if ($request->payment == $total) {
@@ -440,11 +459,24 @@ class ReservationCrudController extends CrudController
         return $html;
     }
 
-    public function getprice($rate_id, $roomtype_id) {
+    public function getprice($rate_id, $roomtype_id, $dm, $dd, $dy, $am, $ad, $ay) {
         $roomrate = Roomrate::where([['rate_id', $rate_id], ['roomtype_id', $roomtype_id]])->first();
+        $roomprice = $roomrate->price;
+
+        $arrival_date = strtotime($am.'/'.$ad.'/'.$ay);
+        $departure_date = strtotime($dm.'/'.$dd.'/'.$dy);
 
 
-        $html = '<label id="price_label">Room Price</label><input type="text" id="price_input" class="form-control" value="'.$roomrate->price.'" disabled >';
+        $datediff = $departure_date - $arrival_date;
+
+        $night = round($datediff / (60 * 60 * 24));
+
+        if ($night > 1) {
+            $roomprice = $roomprice * $night;
+        }
+
+
+        $html = '<label id="price_label">Room Price</label><input type="text" id="price_input" class="form-control" value="'.$roomprice.'" disabled >';
 
         return $html;
     }
@@ -696,6 +728,7 @@ class ReservationCrudController extends CrudController
 
     public function checkIn($id) {
         $reservation = Reservation::find($id);
+
         $dateToday = date('Y-m-d H:i:s');
 
         $reservation->check_in = $dateToday;

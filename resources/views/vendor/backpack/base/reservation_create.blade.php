@@ -170,11 +170,6 @@ $("#discount").on('change keyup paste', function() {
     $('#total').val(discountedPrice);
 });
 
-/*$('#discountBtn').on('click', function() {
-	$("#discount_div").toggleClass('col-xs-3 col-xs-2');
-	$('#discount_div').after('<div class="col-xs-1"><label>Total</label><input type="text" class="form-control" disabled></div>');
-});*/
-
 $("select[name='roomtype_id']").change(function(e)
 {
  	e.preventDefault();
@@ -241,6 +236,8 @@ $("select[name='roomtype_id']").change(function(e)
 				 			}
 				 		});
 	      		}
+
+	      		$('#price_input').val('');
 	      	}
 	   	})
     });{{-- arrival --}}
@@ -267,6 +264,8 @@ $("select[name='roomtype_id']").change(function(e)
 			 				// console.log(data);
 			 			}
 			 		});
+
+			 	$('#price_input').val('');
 	      	}
 	   	});
     });{{-- departure --}}
@@ -278,6 +277,8 @@ $("select[name='roomtype_id']").change(function(e)
 
 		$rate_id = $(this).val();
 		$roomtype_id = $("select[name='roomtype_id']").val();
+		var departure = $('#departure_date').val();
+		var arrival = $('#arrival_date').val();
 
 		$("input").remove( "#price_input" );
 	  	$("label").remove( "#price_label" );
@@ -285,7 +286,7 @@ $("select[name='roomtype_id']").change(function(e)
 	  	// console.log($rate_id + " " + $roomtype_id);
 	  	$.ajax
  		({
- 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id,
+ 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id+'/'+departure+'/'+arrival,
  			type: 'GET',
  			dataType: 'html',
  			success: function(data)

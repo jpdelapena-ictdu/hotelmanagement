@@ -197,6 +197,8 @@ $(document).ready(function() {
 
 		$rate_id = $("select[name='rate_id']").val();
 		$roomtype_id = $("select[name='roomtype_id']").val();
+		var departure = $('#departure_date').val();
+		var arrival = $('#arrival_date').val();
 
 		$("input").remove( "#price_input" );
 	  	$("label").remove( "#price_label" );
@@ -204,7 +206,7 @@ $(document).ready(function() {
 	  	// console.log($rate_id + " " + $roomtype_id);
 	  	$.ajax
  		({
- 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id,
+ 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id+'/'+departure+'/'+arrival,
  			type: 'GET',
  			dataType: 'html',
  			success: function(data)
@@ -334,6 +336,8 @@ $("select[name='roomtype_id']").change(function(e)
 
 		$rate_id = $(this).val();
 		$roomtype_id = $("select[name='roomtype_id']").val();
+		var departure = $('#departure_date').val();
+		var arrival = $('#arrival_date').val();
 
 		$("input").remove( "#price_input" );
 	  	$("label").remove( "#price_label" );
@@ -341,7 +345,7 @@ $("select[name='roomtype_id']").change(function(e)
 	  	// console.log($rate_id + " " + $roomtype_id);
 	  	$.ajax
  		({
- 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id,
+ 			url: '{{ url('admin/getprice') }}/'+$rate_id+'/'+$roomtype_id+'/'+departure+'/'+arrival,
  			type: 'GET',
  			dataType: 'html',
  			success: function(data)
