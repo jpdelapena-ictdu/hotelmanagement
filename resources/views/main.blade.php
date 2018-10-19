@@ -1,7 +1,10 @@
 <!DOCTYPE html>
 <html lang="en">
 
+
+
   <head>
+  	
 		@include('partials._header')
 	</head>
 		<body style="background-image:url({{ asset('img/hotelwp.jpg') }}); background-repeat:no-repeat; background-size: cover; padding-top: 120px;">
