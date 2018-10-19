@@ -46,7 +46,7 @@ class AdminDashboardController extends Controller
     	} // CALENDAR
 
     	// EXPECTED GUESTS
-    	$reservation2 = Reservation::whereDate('arrival', Carbon::today())->whereNull('check_in')->get();
+    	$reservation2 = Reservation::whereDate('arrival', Carbon::today())->whereNull('check_in')->paginate(10);
     	$expectedGuests = [];
     	$c = 0;
 
@@ -68,7 +68,7 @@ class AdminDashboardController extends Controller
     	}// EXPECTED GUESTS
 
     	// GUESTS TODAY
-    	$reservation3 = Reservation::all();
+    	$reservation3 = Reservation::orderBy('created_at', 'desc')->paginate(10);
     	$guestsToday = [];
     	$i = 0;
 

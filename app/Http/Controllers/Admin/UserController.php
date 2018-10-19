@@ -127,4 +127,14 @@ class UserController extends Controller
         \Alert::error('User has been deleted.')->flash();
         return redirect()->route('users.index');
     }
+
+    public function userResetPassword($id) {
+        $user = User::find($id);
+        $user->password = bcrypt('123456789');
+        $user->save();
+
+        // show a success message
+        \Alert::success('Password has been reset.')->flash();
+        return redirect()->back();
+    }
 }

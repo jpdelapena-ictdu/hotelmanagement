@@ -48,11 +48,16 @@
 								<td>{{ $row->name }}</td>
 								<td>{{ $row->email }}</td>
 								<td><a href="{{ route('users.edit', $row->id) }}" class="btn btn-xs btn-default"><i class="fa fa-edit"></i> Edit</a>
-								<button form="resetStudent{{ $row->id }}" class="btn btn-xs btn-default"><i class="fa fa-trash"></i> Delete</button> <a href="#" class="btn btn-xs btn-danger"><i class="fa fa-lock"></i> Reset Password</a>
+								<button form="deleteUser{{ $row->id }}" class="btn btn-xs btn-default"><i class="fa fa-trash"></i> Delete</button> <button form="resetUser{{ $row->id }}" class="btn btn-xs btn-danger"><i class="fa fa-lock"></i> Reset Password</button>
 
-								<form onsubmit="return confirmReset()" id="resetStudent{{ $row->id }}" method="POST" action="{{ route('users.destroy', $row->id) }}">
+								<form onsubmit="return confirmDelete()" id="deleteUser{{ $row->id }}" method="POST" action="{{ route('users.destroy', $row->id) }}">
 									<input type="hidden" name="_token" value="{{ Session::token() }}">
                                     {{ method_field('DELETE') }}
+
+								</form>
+
+								<form onsubmit="return confirmReset()" id="resetUser{{ $row->id }}" method="POST" action="{{ route('user.reset.password', $row->id) }}">
+									{{ csrf_field() }}
 
 								</form>
 								</td>
@@ -96,7 +101,7 @@
     } );
   </script>
   <script>
-	function confirmReset()
+	function confirmDelete()
 	{
 	var x = confirm("Are you sure you want to delete this student?");
 	if (x)
@@ -105,4 +110,15 @@
 	return false;
 	}   
 	</script>
+
+	<script>
+	function confirmReset()
+	{
+	var x = confirm("Are you sure you want to reset this User's password?");
+	if (x)
+	return true;
+	else
+	return false;
+	}   
+</script>
 @endsection

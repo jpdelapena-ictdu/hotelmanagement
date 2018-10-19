@@ -43,7 +43,8 @@
 			<div class="col-xs-12">
 				<div class="box">
 			        <div class="box-header hidden-print with-border">
-						<h4><i class="fa fa-sign-in"></i> Expected Guests</h4>
+						<h4 style="display: inline;"><i class="fa fa-sign-in"></i> Expected Guests</h4>
+						<a href="{{ route('expected-guests') }}" class="btn btn-primary btn-sm pull-right" style="display: inline;">View all</a>
 			        </div>
 			        <div class="table-responsive" style="padding-left: 15px; padding-right: 15px;">
 						@if(empty($expectedguests))
@@ -64,7 +65,8 @@
 			<div class="col-xs-12">
 				<div class="box">
 			        <div class="box-header hidden-print with-border">
-						<h4><i class="fa fa-users"></i> Guests Today</h4>
+						<h4 style="display: inline;"><i class="fa fa-users"></i> Guests Today</h4>
+						<a href="{{ route('guests-today') }}" class="btn btn-primary btn-sm pull-right" style="display: inline;">View all</a>
 			        </div>
 			        <div class="table-responsive" style="padding-left: 15px; padding-right: 15px;">
 						@if(empty($gueststoday))

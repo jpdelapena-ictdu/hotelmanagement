@@ -24,9 +24,11 @@ Route::group([
 	CRUD::resource('reservation', 'ReservationCrudController');
 	CRUD::resource('service', 'ServiceCrudController');
 	Route::resource('users', 'UserController');
+	Route::post('user/resetpassword/{id}', 'UserController@userResetPassword')->name('user.reset.password');
 
 	Route::get('dashboard', 'AdminDashboardController@dashboard')->name('admin.dashboard');
 	
+
 	Route::get('logs', 'LogController@list')->name('log.list');
 	Route::get('checkoutcustomer/{id}', 'ReservationCrudController@customerCheckOut')->name('customer.checkout');
 	Route::get('expected-guests', 'ReservationCrudController@expectedGuests')->name('expected-guests');
