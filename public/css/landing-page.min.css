@@ -81,6 +81,7 @@ body{font-family:Lato,'Helvetica Neue',Helvetica,Arial,sans-serif}
 .center{
 	margin-left: auto;
     margin-right: auto;
+    width: 20em;
     text-align:center;
 	align-content:center;
 }
