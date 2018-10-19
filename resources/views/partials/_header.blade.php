@@ -7,10 +7,11 @@
 
     <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
     <meta http-equiv="Pragma" content="no-cache" />
-    <meta http-equiv="Expires" content="0" />
+     <meta http-equiv="Expires" content="0" />
 
     <link rel="shortcut icon" type="image/x-icon" href="icon/chm.ico" />
     <title>UNUE @yield('title')</title>
+    <link rel="shortcut icon" href="{{ asset('logo.png') }}">
 
     <!-- Bootstrap core CSS -->
     <link href="{{ asset('vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
