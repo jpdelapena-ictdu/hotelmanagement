@@ -78,14 +78,14 @@ body{font-family:Lato,'Helvetica Neue',Helvetica,Arial,sans-serif}
 	top: 50px;
 }
 
-.center{
-	margin-left: auto;
+/* .center{
+    margin-left: auto;
     margin-right: auto;
-    /*width: 8em;*/
+    width: 8em;
     text-align:center;
-	align-content:center;
+    align-content:center;
 }
-
+ */
 .posright{
 	left: 150px;
 }
