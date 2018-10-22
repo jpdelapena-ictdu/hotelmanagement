@@ -3,8 +3,8 @@
 <li class="treeview">
     <a href="#"><i class="fa fa-indent"></i> <span>Facilities</span> <i class="fa fa-angle-left pull-right"></i></a>
         <ul class="treeview-menu">
-        	<li><a href="{{ backpack_url('food') }}"><i class="fa fa-building"></i> <span>Foods</span></a></li>
-        	<li><a href="{{ backpack_url('bathroom') }}"><i class="fa fa-bed"></i> <span>Bathrooms</span></a></li>
+        	<li><a href="{{ backpack_url('food') }}"><i class="fa fa-building"></i> <span>Food</span></a></li>
+        	<li><a href="{{ backpack_url('bathroom') }}"><i class="fa fa-bed"></i> <span>Bathroom</span></a></li>
 			<li><a href="{{ backpack_url('amenity') }}"><i class="fa fa-key"></i> <span>Amenities</span></a></li>
 		</ul>
 </li>
