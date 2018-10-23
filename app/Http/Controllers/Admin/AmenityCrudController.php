@@ -25,7 +25,7 @@ class AmenityCrudController extends CrudController
         $this->crud->setModel('App\Models\Amenity');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/amenity');
         $this->crud->setEntityNameStrings('amenity', 'amenities');
-
+        $this->crud->setListView('vendor.backpack.base.others_list');
         /*
         |--------------------------------------------------------------------------
         | BASIC CRUD INFORMATION

@@ -44,20 +44,19 @@
 		      <h3 class="box-title">{{ trans('backpack::crud.add_a_new') }} {{ $crud->entity_name }}</h3>
 		    </div>
 		    <div class="box-body row display-flex-wrap" style="display: flex; flex-wrap: wrap;">
-		      <!-- load the view from the application if it exists, otherwise load the one in the package -->
-		      {{-- @if(view()->exists('vendor.backpack.crud.form_content'))
-		      	@include('vendor.backpack.crud.form_content', [ 'fields' => $crud->getFields('create'), 'action' => 'create' ])
-		      @else
-		      	@include('crud::form_content', [ 'fields' => $crud->getFields('create'), 'action' => 'create' ])
-		      @endif --}}
 
-          		<div class="form-group col-xs-12">
+      			<div class="form-group col-xs-10">
     				<label>Customer</label>
     				<select name="customer_id" style="width: 100%" class="form-control select2_from_array">
     					@foreach($customers as $row)
 						<option value="{{$row->customer_id}}">{{$row->customer_id. '. ' .$row->firstname. ' ' .$row->lastname}}</option>
 						@endforeach
                     </select>
+				</div>
+
+				<div class="form-group col-xs-2">
+					
+					<a href="{{ route('crud.customer.create') }}" class="btn btn-success btn-block" style="margin-top: 26px;"><i class="fa fa-plus"></i> Add Customer</a>
 				</div>
 
 				<div class="form-group col-xs-6">

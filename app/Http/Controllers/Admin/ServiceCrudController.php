@@ -43,6 +43,14 @@ class ServiceCrudController extends CrudController
         // $this->crud->setColumnsDetails(['column_1', 'column_2'], ['attribute' => 'value']);
 
         // ------ CRUD FIELDS
+        $this->crud->addField([   // select_from_array
+            'name' => 'type',
+            'label' => "Type",
+            'type' => 'select2_from_array',
+            'options' => ['Product' => 'Product', 'Service' => 'Service'],
+            'allows_null' => false,
+            // 'allows_multiple' => true, // OPTIONAL; needs you to cast this to array in your model;
+        ], 'update/create/both');
         // $this->crud->addField($options, 'update/create/both');
         // $this->crud->addFields($array_of_arrays, 'update/create/both');
         // $this->crud->removeField('name', 'update/create/both');

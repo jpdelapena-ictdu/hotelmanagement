@@ -28,13 +28,8 @@
 
     <!-- THE ACTUAL CONTENT -->
     <div class="col-md-12">
-      <div class="box">
-        <!-- <div class="box-header hidden-print with-border">
-        
-          <a href="http://localhost:8000/admin/room/create" class="btn btn-primary ladda-button" data-style="zoom-in"><span class="ladda-label"><i class="fa fa-plus"></i> Add room</span></a>
-        	  		  			  	
-          <div id="datatable_button_stack" class="pull-right text-right hidden-xs"></div>
-        </div> -->
+        <div class="box">
+        </div>
 
         <div class="box-body overflow-hidden">
 			<div id="calendar">

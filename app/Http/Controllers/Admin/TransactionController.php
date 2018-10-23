@@ -64,8 +64,6 @@ class TransactionController extends Controller
     	$customerArr = json_decode(json_encode($customerArr));
     	$transactionArr = json_decode(json_encode($transactionArr));
 
-    	// print_r($customerArr);
-
     	return view('transactions.list')
     		->with('transactions', $transactionArr)
     		->with('services', $services)
@@ -83,7 +81,6 @@ class TransactionController extends Controller
         }
 
         foreach ($_POST as $key => $value) {
-            // echo "<br> key: $key | value: $value <br>";
             if ($key == '_token' || $key == 'customer_id') {
                 continue;
             }

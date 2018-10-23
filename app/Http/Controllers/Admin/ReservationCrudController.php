@@ -322,9 +322,6 @@ class ReservationCrudController extends CrudController
     {
         $en_arrival = date('Y-m-d H:i:s', strtotime($request->arrival));
         $en_departure = date('Y-m-d H:i:s', strtotime($request->departure));
-        /*$request->offsetSet('arrival', $en_arrival);
-        $request->offsetSet('departure', $en_departure);
-        $request->offsetSet('reservation_code', $request->reservation_code);*/
         
         $this->validate($request, [
             'customer_id'          =>             ["required", "not_regex:(---)"],  
@@ -585,13 +582,10 @@ class ReservationCrudController extends CrudController
 
         }
 
-        // return response()->json($packages);
-
         // Send as HTML
 
         $html = '';
 
-        // $html .= '<label id="remove_label">Room</label><select id="remove_select" name="room_id" class="form-control select2_from_array">';
          $html .= '<option> --- </option>';
          foreach ($packages as $package)
          {
@@ -599,7 +593,6 @@ class ReservationCrudController extends CrudController
                 $html .= '<option '.($room_id == $package->id ? 'selected':'').' value="'.$package->id.'"> '.$package->roomcode.' </option>';
             }
          }
-         // $html .= '</select>';
 
         return $html;
 
@@ -673,7 +666,6 @@ class ReservationCrudController extends CrudController
 
         $html = '';
 
-        // $html .= '<label id="roomtype_label">Roomtype</label><select id="roomtype_select" name="roomtype_id" class="form-control select2_from_array">';
         $html .= '<option> --- </option>';
         foreach ($roomtypes as $row)
         {
@@ -681,7 +673,6 @@ class ReservationCrudController extends CrudController
                 $html .= '<option value="'.$row->id.'"> '.$row->typecode.' </option>';
             }
         }
-        // $html .= '</select>';
 
         return $html;
 
@@ -755,8 +746,6 @@ class ReservationCrudController extends CrudController
 
         \Alert::success('Checked out successfully.')->flash();
         return redirect()->route('customer.paid', $reservation->customer_id);
-
-        // print_r($_POST);
     }
 
     public function guestsToday() {
@@ -802,7 +791,7 @@ class ReservationCrudController extends CrudController
     }
 
     public function customerCheckOut($id) {
-        // $customer = Transaction::where('customer_id', $id)->get();
+        
         $reservation = Reservation::find($id);
         $customer = Transaction::where([['customer_id', $reservation->customer_id], ['status', 0]])->get();
 

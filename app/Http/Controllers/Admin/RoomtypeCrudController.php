@@ -33,6 +33,7 @@ class RoomtypeCrudController extends CrudController
         $this->crud->setModel('App\Models\Roomtype');
         $this->crud->setRoute(config('backpack.base.route_prefix') . '/roomtype');
         $this->crud->setEntityNameStrings('roomtype', 'roomtypes');
+        $this->crud->setListView('vendor.backpack.base.others_list');
 
         /*
         |--------------------------------------------------------------------------
@@ -54,7 +55,7 @@ class RoomtypeCrudController extends CrudController
 
         $this->crud->addColumn([
            'name' => 'food', // The db column name
-           'label' => "Food & Drink", // Table column heading
+           'label' => "Food & Beverage", // Table column heading
            'type' => 'foods'
         ]);
 
@@ -66,7 +67,7 @@ class RoomtypeCrudController extends CrudController
 
         $this->crud->addColumn([
            'name' => 'amenities', // The db column name
-           'label' => "Room Amenities", // Table column heading
+           'label' => "Others", // Table column heading
            'type' => 'amenities'
         ]);
         // $this->crud->addColumn(); // add a single column, at the end of the stack
@@ -87,7 +88,7 @@ class RoomtypeCrudController extends CrudController
                 'name' => 'food_'. $food->id,
                 'label' => $food->name,
                 'type' => 'checkbox',
-                'tab' => 'Foods'
+                'tab' => 'Food and Beverage'
             ], 'create');
         }
 
@@ -96,7 +97,7 @@ class RoomtypeCrudController extends CrudController
                 'name' => 'bathroom_'. $bathroom->id,
                 'label' => $bathroom->name,
                 'type' => 'checkbox',
-                'tab' => 'Bathrooms'
+                'tab' => 'Bathroom'
             ], 'create');
         }
 
@@ -105,7 +106,7 @@ class RoomtypeCrudController extends CrudController
                 'name' => 'amenity_'. $amenity->id,
                 'label' => $amenity->name,
                 'type' => 'checkbox',
-                'tab' => 'Amenities'
+                'tab' => 'Others'
             ], 'create');
         }
 
@@ -115,7 +116,7 @@ class RoomtypeCrudController extends CrudController
               'name' => 'food_'. $food->id,
               'label' => $food->name,
               'type' => 'food_checkbox',
-              'tab' => 'Foods'
+              'tab' => 'Food and Beverage'
               /// 'view_namespace' => 'yourpackage' // use a custom namespace of your package to load views within a custom view folder.
             ], 'update');
         }
@@ -126,7 +127,7 @@ class RoomtypeCrudController extends CrudController
               'name' => 'bathroom_'. $bathroom->id,
               'label' => $bathroom->name,
               'type' => 'bathroom_checkbox',
-              'tab' => 'Bathrooms'
+              'tab' => 'Bathroom'
               /// 'view_namespace' => 'yourpackage' // use a custom namespace of your package to load views within a custom view folder.
             ], 'update');
         }
@@ -137,7 +138,7 @@ class RoomtypeCrudController extends CrudController
               'name' => 'amenity_'. $amenity->id,
               'label' => $amenity->name,
               'type' => 'amenity_checkbox',
-              'tab' => 'Amenities'
+              'tab' => 'Others'
               /// 'view_namespace' => 'yourpackage' // use a custom namespace of your package to load views within a custom view folder.
             ], 'update');
         }
@@ -258,18 +259,12 @@ class RoomtypeCrudController extends CrudController
         foreach ($_POST as $key => $value) {
             if($value == 1) {
                 if (strpos($key, 'food_') !== false) {
-                    // echo $key;
-                    // echo substr($key, 5) . "<br>";
                     $foodArray[substr($key, 5)] = substr($key, 5);
                 }
                 if (strpos($key, 'bathroom_') !== false) {
-                    // echo $key;
-                    // echo substr($key, 8) . "<br>";
                     $bathroomArray[substr($key, 9)] = substr($key, 9);
                 }
                 if (strpos($key, 'amenity_') !== false) {
-                    // echo $key;
-                    // echo substr($key, 7) . "<br>";
                     $amenityArray[substr($key, 8)] = substr($key, 8);
                 }
             }
@@ -298,8 +293,5 @@ class RoomtypeCrudController extends CrudController
         $roomtype->bathrooms()->detach();
         $roomtype->amenities()->detach();
         $roomtype->delete();
-        // $this->crud->hasAccessOrFail('delete');
-
-        // return $this->crud->delete($id);
     }
 }

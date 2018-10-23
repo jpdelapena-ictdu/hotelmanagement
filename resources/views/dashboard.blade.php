@@ -12,12 +12,9 @@
 	<section class="content-header">
 	  <h1>
 	    <span class="text-capitalize">Dashboard</span>
-	    {{-- <small>All logs in the database.</small> --}}
 	  </h1>
 	  <ol class="breadcrumb">
-	    {{-- <li><a href="#">tttt</a></li> --}}
 	    <li><a href="/admin/dashboard" class="active">Dashboard</a></li>
-	    {{-- <li class="active">Logs</li> --}}
 	  </ol>
 	</section>
 @endsection
@@ -133,13 +130,5 @@
         })
     });
   </script>
-{{-- 
-  <script>
-    $(document).ready( function () {
-        $('#logsTable').DataTable({
-        	"iDisplayLength": 50,
-			"aLengthMenu": [[10, 25, 50, 100,500,1000,-1], [10, 25, 50,100,500,1000, "All"]],
-        });
-    } );
-  </script> --}}
+
 @endsection

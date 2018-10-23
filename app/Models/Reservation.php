@@ -34,12 +34,12 @@ class Reservation extends Model
 
     public function openGoogle($crud = false)
     {
-        return '<a class="btn btn-primary" target="_blank" href="guests-today" data-toggle="tooltip" title="Just a demo custom button."><i class="fa fa-users"></i> Guests Today</a>';
+        return '<a class="btn btn-primary" target="_blank" href="guests-today" data-toggle="tooltip" title="Just a demo custom button."><i class="fa fa-users"></i> View Guests Today</a>';
     }
 
     public function expectedGuests($crud = false)
     {
-        return '<a class="btn btn-primary" target="_blank" href="expected-guests" data-toggle="tooltip" title="View expected guests."><i class="fa fa-users"></i> Expected Guests</a>';
+        return '<a class="btn btn-primary" target="_blank" href="expected-guests" data-toggle="tooltip" title="View expected guests."><i class="fa fa-users"></i> View Expected Guests</a>';
     }
 
     /*

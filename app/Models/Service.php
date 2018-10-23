@@ -19,7 +19,7 @@ class Service extends Model
     // protected $primaryKey = 'id';
     // public $timestamps = false;
     // protected $guarded = ['id'];
-    protected $fillable = ['service', 'price'];
+    protected $fillable = ['service', 'price', 'type'];
     // protected $hidden = [];
     // protected $dates = [];
 

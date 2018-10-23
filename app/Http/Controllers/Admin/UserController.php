@@ -105,8 +105,6 @@ class UserController extends Controller
 
         $user->name = $request->name;
         $user->email = $request->email;
-        // $user->password = bcrypt('123456789');
-        // $user->role = 2;
         $user->save();
 
         \Alert::success('User has been changed.')->flash();

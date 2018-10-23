@@ -15,7 +15,6 @@
 	    <small>All transactions in the database.</small>
 	  </h1>
 	  <ol class="breadcrumb">
-	    {{-- <li><a href="#">tttt</a></li> --}}
 	    <li><a href="/admin/dashboard" class="text-capitalize">Dashboard</a></li>
 	    <li class="active">Transactions</li>
 	  </ol>
